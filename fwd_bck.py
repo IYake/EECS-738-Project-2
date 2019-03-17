@@ -1,23 +1,7 @@
-#states = ('Healthy', 'Fever')
-#end_st = 'E'
-# 
-#observations = ('normal', 'cold', 'dizzy')
-# 
-#start_prob = {'Healthy': 0.6, 'Fever': 0.4}
-# 
-#trans_prob = {
-#   'Healthy' : {'Healthy': 0.69, 'Fever': 0.3, 'E': 0.01},
-#   'Fever' : {'Healthy': 0.4, 'Fever': 0.59, 'E': 0.01},
-#   }
-# 
-#emm_prob = {
-#   'Healthy' : {'normal': 0.5, 'cold': 0.4, 'dizzy': 0.1},
-#   'Fever' : {'normal': 0.1, 'cold': 0.3, 'dizzy': 0.6},
-#   }
-
 states = ('S1','S2')
-end_st = 'end' #last observation reached
+end_st = 'end' 
 observations = ('N','N','N','N','N','E','E','N','N','N')
+#pi
 start_prob = {'S1':0.5,'S2':0.5}
 trans_prob = {
         'S1' : {'S1':0.5,'S2':0.49,'end':.01 },
@@ -75,3 +59,50 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     #return posterior
 
 forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
+
+############### MAXIMIZATION STEP ##################
+def update_start_prob(gammas):
+    return gammas[0]
+
+#get epsilon
+
+def update_eps(forward,backward,observations,trans_prob,emm_prob):
+    epsilons = []
+    denom = 0
+    for st1 in states:
+        for st2 in states:
+            for i in range(len(observations)-1):
+                denom += forward[i][st1]*trans_prob[st1][st2]              \
+                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+    for st1 in states:
+        for st2 in states:
+            for i in range(len(observations)-1):#can't assign last value
+                eps = forward[i][st1]*trans_prob[st1][st2]              \
+                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+                epsilons.append({st1 : {st2 : {i : eps}}})
+    return epsilons
+
+def update_trans_prob(epsilons,gammas):
+    temp_trans = [{st1: {st2: 0 for st2 in states} for st1 in states}]
+    denom = [{st: 0 for st in states}]
+    for st in states:
+        for i in range(len(observations)):
+            denom[st] += gammas[i]
+            #check if this works
+#    
+#    for st1 in states:
+#        for st2 in states:
+#            for i in range(len(observations)-1):
+#                temp_trans[st1][st2] += epsilons[st1][st2][i]
+#    
+#    for st1 in states:
+#        for st2 in states:
+#            temp_trans[st1][st2] /= denom[st1]
+#    
+#    return temp_trans
+        
+epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
+
+trans_prob = update_trans_prob(epsilons,gammas)
+
+print(trans_prob)
