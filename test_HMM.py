@@ -5,7 +5,7 @@ import numpy as np
 #       - can also be used to predict next state, given sequence of observations
 # 3) backward procedure to find probability of ending observation sequence given starting state i and time t
 # 4) update transition and then emission matrices
-#       - 4.1 calculate temporary variables lambda and epsilon
+#       - 4.1 calculate temporary variables gamma and epsilon
 #       - 4.2 update pi, then transition matrix, then emission matrix
 # 5) repeat 1-4 until desired level of convergence (using log likelihood function)
 #       - also can test with diff number of states to see best convergence
@@ -53,6 +53,11 @@ def forward(Y,theta):
 #    print(pi[0])
     def alpha(i,t):
         if t is 0:
+#            if i is 0:
+#                print("pi[0]: ",pi[i])
+#                print("B[0]yt+1: ",B[i][B_cols.index(Y[1])])
+#                print("t: ",t,end="\n\n\")
+                
             return pi[i]*B[i][B_cols.index(Y[1])]
         else:
             ans = 0
@@ -99,27 +104,30 @@ def backward(Y,theta):
 betas = backward(Y,theta)
 #print("betas: ", betas, end = "\n\n")
 
-def update_lam(alphas,betas):
-    lambdas = np.zeros([num_states,num_obs])
+def update_gam(alphas,betas):
+    gammas = np.zeros([num_states,num_obs])
     #check that all i's and j's in program correspond to the correct number of states or observations
     denom = np.zeros([1,num_obs])
 #    for i in range(num_symbols):
-#        lambdas[j] = np.divide(
+#        gammas[j] = np.divide(
 #                np.multiply(alphas[j],betas[j]),
 #                np.sum(np.multiply(alphas[j],betas[j]))
 #                )
-    lambdas = np.multiply(alphas,betas)
+    gammas = np.multiply(alphas,betas)
+    #print("gammas added: ", gammas[0]+gammas[1], end="\n\n")
     for j in range(num_states):
         denom += np.multiply(alphas[j],betas[j])
-    lambdas = np.divide(lambdas,denom)
+    #print("denom: ",denom, end="\n\n")
+    gammas = np.divide(gammas,denom)
+    
     #denominator is all one value because alpha*beta[0]+alpha*beta[1] is all the same value. Is this correct?
-    return lambdas
+    return gammas
 
 
 
-lambdas = update_lam(alphas,betas)
+gammas = update_gam(alphas,betas)
 
-#print("lambdas: ", lambdas[0], end = "\n\n")
+#print("\ngammas: ", gammas, end = "\n\n")
 
 #Check if this works. Not sure
 def update_eps(alphas,betas,Y,theta):
@@ -138,16 +146,19 @@ def update_eps(alphas,betas,Y,theta):
     
     for i in range(num_states):
         for j in range(num_states):
-            for t in range(num_obs-1):
-                #range might be messed up
-                epsilons[i][j][t] = epsilon(i,j,t)
+            for t in range(num_obs):
+                #if statement placed because equation can't parse last value, bj(yt+1) doesn't exist
+                if t != num_obs-1:
+                    epsilons[i][j][t] = epsilon(i,j,t)
+                else:
+                    epsilons[i][j][t] = None
     return epsilons
             
 epsilons = update_eps(alphas,betas,Y,theta)
 print(epsilons)
 
-#for episilon i might be # of states, not number of observations.
-# REDO all procedures with i and j as state variables, not number of observations!!!!!!!!
+
+
 
 
 
