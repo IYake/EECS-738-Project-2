@@ -53,11 +53,6 @@ def forward(Y,theta):
 #    print(pi[0])
     def alpha(i,t):
         if t is 0:
-#            if i is 0:
-#                print("pi[0]: ",pi[i])
-#                print("B[0]yt+1: ",B[i][B_cols.index(Y[1])])
-#                print("t: ",t,end="\n\n\")
-
             return pi[i]*B[i][B_cols.index(Y[1])]
         else:
             ans = 0
@@ -85,14 +80,6 @@ def backward(Y,theta):
             ans = 0
             for j in range(num_states):
                 ans += beta(j,t+1)*A[i][j]*B[j][B_cols.index(Y[t+1])]
-#                if i is 0 and t is num_obs - 2:
-#                    print("i: %d" % i)
-#                    print("j: %d" % j)
-#                    print("B[j](t+1) = %f" % beta(j,t+1))
-#                    print("A[i][j] = %f" % A[i][j])
-#                    print("bj(yt+1) = %f" % B[j][B_cols.index(Y[t+1])])
-#                    if (True):
-#                        print("ans = %f" % ans, end = "\n\n")
             return ans
 
     betas = np.zeros([num_states,num_obs])
@@ -126,7 +113,8 @@ def update_gam(alphas,betas):
 
 
 gammas = update_gam(alphas,betas)
-
+print(np.sum(gammas[0]))
+print(np.sum(gammas[1]))
 #print("\ngammas: ", gammas, end = "\n\n")
 
 #Check if this works. Not sure
@@ -205,7 +193,7 @@ def update_A(epsilons,gammas):
 
 A = update_A(epsilons,gammas)
 def Update(Y, theta):
-    for i in range(3):
+    for i in range(10):
         # print(i)
         alphas = forward(Y,theta)
         betas = forward(Y,theta)
@@ -218,14 +206,10 @@ def Update(Y, theta):
         theta[1] = B
         theta[2] = pi
         print("LOOP")
-        print("gammas: " , gammas)
-        print("alphas: ", alphas)
-        print("betas:", betas)
-        print("pi: ", pi)
-        # print(A)
-        # print(B)
+#        print("gammas: " , gammas)
+#        print("alphas: ", alphas)
+#        print("betas:", betas)
+#        print("pi: ", pi)
+        print("pi: ",)
         print("\n")
-    print(A)
-    print("\n")
-    print(B)
-Update(Y, theta)
+#Update(Y, theta)
