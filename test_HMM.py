@@ -155,9 +155,60 @@ def update_eps(alphas,betas,Y,theta):
     return epsilons
             
 epsilons = update_eps(alphas,betas,Y,theta)
-print(epsilons)
+#print(epsilons)
 
+def update_pi(gammas):
+    temp = np.zeros([num_states,1])
+    for i in range(num_states):
+        temp[i] = gammas[i][0]
+    return temp
 
+#update emission matrix
+    
+def update_B(Y,gammas,B_cols):
+    temp = np.zeros([num_states,num_symbols])
+    denom = np.zeros([num_states,1])
+    for i in range(num_states):
+        denom[i] = np.sum(gammas[i])
+        
+    for symbol in enumerate(B_cols):
+        for i in range(num_states):
+            for t in range(num_obs):
+                if Y[t] == symbol[1]:
+                    temp[i][symbol[0]] += gammas[i][t]
+            temp[i][symbol[0]] /= denom[i]
+            #print(temp)
+    for r in range(num_states):
+        for c in range(num_symbols):
+            temp[r][c] = temp[r][c]/np.sum(temp[r])
+    return temp
+
+B = update_B(Y,gammas,B_cols)
+#print(B)
+#print(gammas)
+
+def update_A(epsilons,gammas):
+    denom = np.zeros([num_states,1])
+    for i in range(num_states):
+        denom[i] = np.sum(gammas[i])
+    
+    temp = np.zeros([num_states,num_states])
+    for i in range(num_states):
+        for j in range(num_states):
+            temp[i][j] = np.sum(epsilons[i][j][:-1])/denom[i]
+
+    #normalize rows
+    for r in range(num_states):
+        for c in range(num_states):
+            temp[r][c] = temp[r][c]/np.sum(temp[r])
+    return temp
+
+A = update_A(epsilons,gammas)
+print(B)
+            
+        
+    
+    
 
 
 
