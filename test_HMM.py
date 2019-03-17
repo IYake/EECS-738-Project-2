@@ -57,7 +57,7 @@ def forward(Y,theta):
 #                print("pi[0]: ",pi[i])
 #                print("B[0]yt+1: ",B[i][B_cols.index(Y[1])])
 #                print("t: ",t,end="\n\n\")
-                
+
             return pi[i]*B[i][B_cols.index(Y[1])]
         else:
             ans = 0
@@ -76,7 +76,7 @@ alphas = forward(Y,theta)
 def backward(Y,theta):
     A = theta[0]
     B = theta[1]
-    
+
     def beta(i,t):
         if t is (num_obs-1):
             #this might not be the correct interpretation
@@ -94,7 +94,7 @@ def backward(Y,theta):
 #                    if (True):
 #                        print("ans = %f" % ans, end = "\n\n")
             return ans
-    
+
     betas = np.zeros([num_states,num_obs])
     for i in range(num_states):
         for t in range(num_obs):
@@ -119,7 +119,7 @@ def update_gam(alphas,betas):
         denom += np.multiply(alphas[j],betas[j])
     #print("denom: ",denom, end="\n\n")
     gammas = np.divide(gammas,denom)
-    
+
     #denominator is all one value because alpha*beta[0]+alpha*beta[1] is all the same value. Is this correct?
     return gammas
 
@@ -133,7 +133,7 @@ gammas = update_gam(alphas,betas)
 def update_eps(alphas,betas,Y,theta):
     A = theta[0]
     B = theta[1]
-    
+
     epsilons = np.zeros([num_states,num_states,num_obs])
     def epsilon(i,j,t):
         eps = alphas[i][t]*A[i][j]*betas[j][t+1]*B[j][B_cols.index(Y[t+1])]
@@ -142,8 +142,8 @@ def update_eps(alphas,betas,Y,theta):
             for j in range(num_states):
                 denom += alphas[i][t]*A[i][j]*betas[j][t+1]*B[j][B_cols.index(Y[t+1])]
         return eps/denom
-    
-    
+
+
     for i in range(num_states):
         for j in range(num_states):
             for t in range(num_obs):
@@ -153,7 +153,7 @@ def update_eps(alphas,betas,Y,theta):
                 else:
                     epsilons[i][j][t] = None
     return epsilons
-            
+
 epsilons = update_eps(alphas,betas,Y,theta)
 #print(epsilons)
 
@@ -164,13 +164,13 @@ def update_pi(gammas):
     return temp
 
 #update emission matrix
-    
+
 def update_B(Y,gammas,B_cols):
     temp = np.zeros([num_states,num_symbols])
     denom = np.zeros([num_states,1])
     for i in range(num_states):
         denom[i] = np.sum(gammas[i])
-        
+
     for symbol in enumerate(B_cols):
         for i in range(num_states):
             for t in range(num_obs):
@@ -191,7 +191,7 @@ def update_A(epsilons,gammas):
     denom = np.zeros([num_states,1])
     for i in range(num_states):
         denom[i] = np.sum(gammas[i])
-    
+
     temp = np.zeros([num_states,num_states])
     for i in range(num_states):
         for j in range(num_states):
@@ -204,17 +204,28 @@ def update_A(epsilons,gammas):
     return temp
 
 A = update_A(epsilons,gammas)
-print(B)
-            
-        
-    
-    
-
-
-
-
-
-    
-    
-
-    
+def Update(Y, theta):
+    for i in range(3):
+        # print(i)
+        alphas = forward(Y,theta)
+        betas = forward(Y,theta)
+        gammas = update_gam(alphas, betas)
+        epsilons = update_eps(alphas, betas, Y, theta)
+        A = update_A(epsilons, gammas)
+        B = update_B(Y, gammas, B_cols)
+        pi = update_pi(gammas)
+        theta[0] = A
+        theta[1] = B
+        theta[2] = pi
+        print("LOOP")
+        print("gammas: " , gammas)
+        print("alphas: ", alphas)
+        print("betas:", betas)
+        print("pi: ", pi)
+        # print(A)
+        # print(B)
+        print("\n")
+    print(A)
+    print("\n")
+    print(B)
+Update(Y, theta)
