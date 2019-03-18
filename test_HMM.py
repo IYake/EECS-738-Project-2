@@ -169,6 +169,7 @@ def update_B(Y,gammas,B_cols):
     for r in range(num_states):
         for c in range(num_symbols):
             temp[r][c] = temp[r][c]/np.sum(temp[r])
+    print(temp)
     return temp
 
 B = update_B(Y,gammas,B_cols)
