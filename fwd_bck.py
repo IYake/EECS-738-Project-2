@@ -126,12 +126,12 @@ def update_em_prob(observations, gammas, states):
     for st1 in states:
         for ob in ob_type:
             for i in range(len(observations)):
-                print(observations[i], st1)
                 if observations[i] == ob:
                     temp_em[st1][ob] += gammas[i][st1]
             temp_em[st1][ob] /= denom[st1]
-            
     return temp_em
+
+
 
 epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
 trans_prob = update_trans_prob(epsilons,gammas)
