@@ -68,21 +68,20 @@ def update_start_prob(gammas):
 
 #get epsilon
 def update_eps(forward,backward,observations,trans_prob,emm_prob):
-#    epsilons = []
-    epsilons = {}
-    denom = 0
+    epsilons = {st1 : {st2 : {i : 0 for i in range(len(observations))} for st2 in states} for st1 in states}
+    denom = {i : 0 for i in range(len(observations))}
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):
-                denom += forward[i][st1]*trans_prob[st1][st2]              \
+                denom[i] += forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i]]
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
                 eps = forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i]]
-                #epsilons.append({st1 : {st2 : {i : eps}}})
-                epsilons[(st1,st2,i)] = eps 
+                epsilons[st1][st2][i] = eps / denom[i]
+    
     return epsilons
 
 def update_trans_prob(epsilons,gammas):
@@ -96,8 +95,19 @@ def update_trans_prob(epsilons,gammas):
         for st2 in states:
             temp_trans[st1][st2] = 0
             for i in range(len(observations)-1):
-                temp_trans[st1][st2] += epsilons[(st1,st2,i)]
+                pass
+                temp_trans[st1][st2] += epsilons[st1][st2][i]
             temp_trans[st1][st2] /= denom[st1]
+    
+    #normalize
+    rowSum = {st : 0 for st in states}
+    for st1 in states:
+        for st2 in states:
+            rowSum[st1] += trans_prob[st1][st2]
+        for st2 in states:
+            temp_trans[st1][st2] /= rowSum[st1]
+    
+    
 
     return temp_trans
 
