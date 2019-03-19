@@ -81,7 +81,7 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob):
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
                 eps = forward[i][st1]*trans_prob[st1][st2]              \
-                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+                      *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
                 #epsilons.append({st1 : {st2 : {i : eps}}})
                 epsilons[(st1,st2,i)] = eps
     return epsilons
@@ -103,34 +103,48 @@ def update_trans_prob(epsilons,gammas):
     return temp_trans
 
 def update_em_prob(observations, gammas, states):
-    num_states = len(states)
-    num_symbols = len(dict.fromkeys(observations))
-    num_obs = len(observations)
-    temp = np.zeros([num_states,num_symbols])
-    denom = np.zeros([num_states,1])
-    for i in range(num_states):
-        for d in gammas:
-            denom[i] += d[states[i]]
-    for symbol in enumerate(ob_type):
-        for i in range(num_states):
-            for t in range(num_obs):
-                # print("Obs and symbol", observations[t], symbol[1])
-                if observations[t] == symbol[1]:
-                    # print("in if:", temp[i][symbol[0]])
-                    temp[i][symbol[0]] += gammas[t][states[i]]
-            # print("THIS", temp[i][symbol[0]])
-            temp[i][symbol[0]] /= denom[i]
-    for r in range(num_states):
-        for c in range(num_symbols):
-            temp[r][c] = temp[r][c]/np.sum(temp[r])
+    #
+    # for i in range(num_states):
+    #     for d in gammas:
+    #         denom[i] += d[states[i]]
+    # for symbol in enumerate(ob_type):
+    #     for i in range(num_states):
+    #         for t in range(num_obs):
+    #             # print("Obs and symbol", observations[t], symbol[1])
+    #             if observations[t] == symbol[1]:
+    #                 # print("in if:", temp[i][symbol[0]])
+    #                 temp[i][symbol[0]] += gammas[t][states[i]]
+    #         # print("THIS", temp[i][symbol[0]])
+    #         temp[i][symbol[0]] /= denom[i]
+    # for r in range(num_states):
+    #     for c in range(num_symbols):
+    #         temp[r][c] = temp[r][c]/np.sum(temp[r])
     # print("TEMP:", temp)
-    return temp
+    ###############################
+    #new start
+    ################################
+    temp_em = {st1:{ob:0 for ob in ob_type}for st1 in states}
+    denom = {st:0 for st in states}
+    #denominator
+    for st in states:
+        for i in range(len(observations)):
+            denom[st] += gammas[i][st]
+    #numerator
+    for st1 in states:
+        for ob in ob_type:
+            for i in range(len(observations)):
+                print(observations[i], st1)
+                if observations[i] == ob:
+                    temp_em[st1][ob] += epsilons[(st1,ob,i)]
+            temp_em[st1][ob] /= denom[st1]
+
+    return temp_em
 
 epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
 trans_prob = update_trans_prob(epsilons,gammas)
-
-print(trans_prob)
+# pprint.pprint(epsilons)
+# print(trans_prob)
 # print(trans_prob)
 # print(gammas)
-#em_prob = update_em_prob(observations, gammas, states)
-#print(em_prob)
+em_prob = update_em_prob(observations, gammas, states)
+pprint.pprint(em_prob)
