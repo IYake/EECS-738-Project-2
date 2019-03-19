@@ -115,7 +115,7 @@ def update_trans_prob(epsilons,gammas):
 
     return temp_trans
 
-def update_em_prob(observations, gammas, states):
+def update_em_prob(observations, gammas):
     temp_em = {st1:{ob:0 for ob in ob_type}for st1 in states}
     denom = {st:0 for st in states}
     #denominator
@@ -126,11 +126,10 @@ def update_em_prob(observations, gammas, states):
     for st1 in states:
         for ob in ob_type:
             for i in range(len(observations)):
-                print(observations[i], st1)
                 if observations[i] == ob:
                     temp_em[st1][ob] += gammas[i][st1]
             temp_em[st1][ob] /= denom[st1]
-            
+
     return temp_em
 
 epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
@@ -139,5 +138,22 @@ trans_prob = update_trans_prob(epsilons,gammas)
 # print(trans_prob)
 # print(trans_prob)
 # print(gammas)
-em_prob = update_em_prob(observations, gammas, states)
-pprint.pprint(em_prob)
+em_prob = update_em_prob(observations, gammas)
+# pprint.pprint(em_prob)
+
+def Update(observations, trans_prob, emm_prob, start_prob):
+    for i in range(10):
+        # print(i)
+        forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
+        epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob)
+        trans_prob = update_trans_prob(epsilons, gammas)
+        emm_prob = update_em_prob(observations, gammas)
+        start_prob = update_start_prob(gammas)
+        print("LOOP")
+#        print("gammas: " , gammas)
+#        print("alphas: ", alphas)
+#        print("betas:", betas)
+        print("pi: ", start_prob)
+        pprint.pprint(trans_prob)
+        print("\n")
+Update(observations, trans_prob, emm_prob, start_prob)
