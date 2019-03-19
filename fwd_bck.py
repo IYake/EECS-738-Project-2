@@ -1,4 +1,5 @@
 import numpy as np
+import pprint
 states = ('S1','S2')
 end_st = 'end'
 observations = ('N','N','N','N','N','E','E','N','N','N')
@@ -74,12 +75,12 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob):
         for st2 in states:
             for i in range(len(observations)-1):
                 denom += forward[i][st1]*trans_prob[st1][st2]              \
-                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+                      *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
                 eps = forward[i][st1]*trans_prob[st1][st2]              \
-                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+                      *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
                 epsilons.append({st1 : {st2 : {i : eps}}})
     return epsilons
 
@@ -110,7 +111,6 @@ def update_em_prob(observations, gammas, states):
     for i in range(num_states):
         for d in gammas:
             denom[i] += d[states[i]]
-
     for symbol in enumerate(ob_type):
         for i in range(num_states):
             for t in range(num_obs):
@@ -127,7 +127,7 @@ def update_em_prob(observations, gammas, states):
     return temp
 
 epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
-
+pprint.pprint(epsilons)
 # trans_prob = update_trans_prob(epsilons,gammas)
 # print(trans_prob)
 # print(gammas)
