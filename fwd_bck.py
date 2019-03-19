@@ -69,7 +69,8 @@ def update_start_prob(gammas):
 
 #get epsilon
 def update_eps(forward,backward,observations,trans_prob,emm_prob):
-    epsilons = []
+#    epsilons = []
+    epsilons = {}
     denom = 0
     for st1 in states:
         for st2 in states:
@@ -80,28 +81,27 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob):
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
                 eps = forward[i][st1]*trans_prob[st1][st2]              \
-                      *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
-                epsilons.append({st1 : {st2 : {i : eps}}})
+                      *backward[i+1][st2]*emm_prob[st2][observations[i]]
+                #epsilons.append({st1 : {st2 : {i : eps}}})
+                epsilons[(st1,st2,i)] = eps
     return epsilons
 
 def update_trans_prob(epsilons,gammas):
-    temp_trans = [{st1: {st2: 0 for st2 in states} for st1 in states}]
-    denom = [{st: 0 for st in states}]
+    temp_trans = {st1:{st2:0 for st2 in states}for st1 in states}
+    denom = {st:0 for st in states}
     for st in states:
         for i in range(len(observations)):
-            denom[st] += gammas[i]
-            #check if this works
-#
-#    for st1 in states:
-#        for st2 in states:
-#            for i in range(len(observations)-1):
-#                temp_trans[st1][st2] += epsilons[st1][st2][i]
-#
-#    for st1 in states:
-#        for st2 in states:
-#            temp_trans[st1][st2] /= denom[st1]
-#
-#    return temp_trans
+            denom[st] += gammas[i][st]
+
+    for st1 in states:
+        for st2 in states:
+            temp_trans[st1][st2] = 0
+            for i in range(len(observations)-1):
+                temp_trans[st1][st2] += epsilons[(st1,st2,i)]
+            temp_trans[st1][st2] /= denom[st1]
+
+    return temp_trans
+
 def update_em_prob(observations, gammas, states):
     num_states = len(states)
     num_symbols = len(dict.fromkeys(observations))
@@ -127,9 +127,10 @@ def update_em_prob(observations, gammas, states):
     return temp
 
 epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
-pprint.pprint(epsilons)
-# trans_prob = update_trans_prob(epsilons,gammas)
+trans_prob = update_trans_prob(epsilons,gammas)
+
+print(trans_prob)
 # print(trans_prob)
 # print(gammas)
-em_prob = update_em_prob(observations, gammas, states)
-print(em_prob)
+#em_prob = update_em_prob(observations, gammas, states)
+#print(em_prob)
