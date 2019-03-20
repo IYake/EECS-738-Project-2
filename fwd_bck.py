@@ -1,18 +1,44 @@
 import numpy as np
 import pprint
+num_states = 2 #taken in with HMM parameters
+observations = ('N','N','N','N','N','E','E','N','N','N')
+
+string = 'S'
+# states = [string+str(i) for i in range(1, num_states+1)]
 states = ('S1','S2')
 end_st = 'end'
-observations = ('N','N','N','N','N','E','E','N','N','N')
+
 ob_type = ["N", "E"]
+# ob_type = list(dict.fromkeys(observations).keys())
 #pi
 start_prob = {'S1':0.5,'S2':0.5}
+# start_prob = {}
+# for i in range(len(states)):
+#     start_prob[states[i]]= (1/num_states)
+
+# trans_prob = {}
+# for i in range(len(states)):
+#     trans_prob[states[i]] = {}
+#     for j in range(len(states)+1):
+#         if j == len(states):
+#             trans_prob[states[i]][end_st] = .01
+#         elif j== len(states) -1:
+#             trans_prob[states[i]][states[j]] = ((1/num_states)-.01)
+#         else:
+#             trans_prob[states[i]][states[j]] = (1/num_states)
 trans_prob = {
-        'S1' : {'S1':0.5,'S2':0.49,'end':.01 },
-        'S2' : {'S1':0.3,'S2':0.69,'end':.01}
+        'S1' : {'S1':0.5, 'S2':0.49,'end':.01 },
+        'S2' : {'S1':0.8, 'S2':0.19,'end':.01 }
         }
+# emm_prob = {}
+# for i in range(len(states)):
+#     emm_prob[states[i]] = {}
+#     for j in range(len(ob_type)):
+#         emm_prob[states[i]][ob_type[j]] = (1/len(ob_type))
+
 emm_prob = {
-        'S1' : {'N':0.3,'E':0.7},
-        'S2' : {'N':0.8,'E':0.2}
+        'S1' : {'N':0.5,'E':0.5},
+        'S2' : {'N':0.5,'E':0.5}
         }
 
 def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
@@ -142,18 +168,18 @@ em_prob = update_em_prob(observations, gammas)
 # pprint.pprint(em_prob)
 
 def Update(observations, trans_prob, emm_prob, start_prob):
-    for i in range(10):
+    for i in range(100):
         # print(i)
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob)
         trans_prob = update_trans_prob(epsilons, gammas)
         emm_prob = update_em_prob(observations, gammas)
         start_prob = update_start_prob(gammas)
-        print("LOOP")
-#        print("gammas: " , gammas)
+        # print("LOOP")
+        # pprint.pprint( gammas)
 #        print("alphas: ", alphas)
 #        print("betas:", betas)
-        print("pi: ", start_prob)
-        pprint.pprint(trans_prob)
-        print("\n")
+        # print("pi: ", start_prob)
+        # pprint.pprint(trans_prob)
+        # print("\n")
 Update(observations, trans_prob, emm_prob, start_prob)
