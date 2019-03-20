@@ -1,3 +1,7 @@
+"""
+Forward backward algorithm from:
+https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
+"""
 import numpy as np
 import pprint
 num_states = 2 #taken in with HMM parameters
@@ -90,6 +94,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
 
 ############### MAXIMIZATION STEP ##################
+
 def update_start_prob(gammas):
     return gammas[0]
 
@@ -136,9 +141,6 @@ def update_trans_prob(epsilons,gammas):
             rowSum += temp_trans[st1][st2]
         for st2 in states:
             temp_trans[st1][st2] /= rowSum
-
-
-
     return temp_trans
 
 def update_em_prob(observations, gammas):
@@ -155,31 +157,20 @@ def update_em_prob(observations, gammas):
                 if observations[i] == ob:
                     temp_em[st1][ob] += gammas[i][st1]
             temp_em[st1][ob] /= denom[st1]
-
     return temp_em
 
-epsilons = update_eps(forward,backward,observations,trans_prob,emm_prob)
-trans_prob = update_trans_prob(epsilons,gammas)
-# pprint.pprint(epsilons)
-# print(trans_prob)
-# print(trans_prob)
-# print(gammas)
-em_prob = update_em_prob(observations, gammas)
-# pprint.pprint(em_prob)
 
 def Update(observations, trans_prob, emm_prob, start_prob):
-    for i in range(100):
+    #do this to log probability in the future
+    for i in range(10):
         # print(i)
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob)
         trans_prob = update_trans_prob(epsilons, gammas)
         emm_prob = update_em_prob(observations, gammas)
         start_prob = update_start_prob(gammas)
-        # print("LOOP")
-        # pprint.pprint( gammas)
-#        print("alphas: ", alphas)
-#        print("betas:", betas)
-        # print("pi: ", start_prob)
-        # pprint.pprint(trans_prob)
-        # print("\n")
+#        print("Iteration: %i" % (i+1))
+#        print("pi: ", start_prob)
+#        pprint.pprint(trans_prob)
+#        print("\n")
 Update(observations, trans_prob, emm_prob, start_prob)
