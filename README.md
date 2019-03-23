@@ -6,6 +6,7 @@ and the emission matrix to predict the next n number of words.
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
+https://en.m.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm
 
 # Dataset:
 https://www.kaggle.com/kingburrito666/shakespeare-plays
