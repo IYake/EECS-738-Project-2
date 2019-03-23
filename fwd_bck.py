@@ -191,7 +191,7 @@ def generate(model, numWords):
     start_prob = model[2]
     states = model[3]
     ob_type = model[4]
-    
+
     emm_list = [[0 for j in range(len(ob_type))] for i in range(len(states))] #list form to be interpretated by choices()
     for st in states:
         i = states.index(st)
@@ -205,24 +205,22 @@ def generate(model, numWords):
         for st2 in states:
             j = states.index(st2)
             trans_list[i][j] = trans_prob[st1][st2]
-    
+
     #find starting states
     start_prob_list = list(start_prob.values())
     start_st = random.choices([i for i in range(len(start_prob_list))], start_prob_list,k=1)[0]
-    
+
     generatedSentence = []
     curr_st = start_st
     for i in range(numWords):
         generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
-        
+
     print(" ".join(generatedSentence))
     
 if __name__ == "__main__":
     observations = ('N','N','N','N','N','E','E','N','N','N')
     model = trainHMM(10,observations, save_as = "testModel")
     generate(model,10)
-
-    
 
     
