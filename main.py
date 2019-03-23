@@ -1,4 +1,4 @@
-from fwd_bck import trainHMM, save, load
+from fwd_bck import trainHMM, save, load, generate
 import pprint as pp
 import pandas as pd
 import sys
@@ -9,7 +9,7 @@ def main():
     #df = pd.read_csv('Shakespeare_data.csv', usecols = [col])
     #obs = df.values.tolist()
     # obs = [tuple(x) for x in df.values]
-    observations = ('N','N','N','N','N','E','E','N','N','N')
+    #observations = ('N','N','N','N','N','E','E','N','N','N')
 #    all_words =[]
 #    for i in range(10):#range(len(obs)):
 #        for j in range(len(obs[i])):
@@ -21,5 +21,6 @@ def main():
     # pp.pprint(all_words)
     #model = trainHMM(2, observations)
     model = load('train.pickle')
+    generate(model,10)
 if __name__ == "__main__":
     main()
