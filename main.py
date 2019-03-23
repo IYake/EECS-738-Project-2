@@ -16,6 +16,9 @@ def main():
     for i in range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
+           # print(sentence)
+           if sentence == []:
+               continue
            if sentence[0].strip() == "SCENE":
                continue
            elif sentence[0].strip() == "ACT":
@@ -25,6 +28,7 @@ def main():
                    all_words.append(word)
     all_words = tuple(all_words)
     model = load('train.pickle')
+    pp.pprint(len(model))
     generate(model,10)
     # model = load('train.pickle')
 if __name__ == "__main__":
