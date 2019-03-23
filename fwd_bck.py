@@ -10,16 +10,13 @@ def trainHMM(num_states, observations):
     # num_states = 2 #taken in with HMM parameters
     num_states = num_states
     observations = observations
-    # observations = ('N','N','N','N','N','E','E','N','N','N')
 
     string = 'S'
     states = [string+str(i) for i in range(1, num_states+1)]
-    # states = ('S1','S2')
     end_st = 'end'
 
     ob_type = list(dict.fromkeys(observations).keys())
     #pi
-    start_prob = {'S1':0.5,'S2':0.5}
     start_prob = {}
     for i in range(len(states)):
         start_prob[states[i]]= (1/num_states)
@@ -185,7 +182,6 @@ def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_typ
 #    pprint.pprint(emm_prob)
 #    print("Trans")
 #    pprint.pprint(trans_prob)
-    
     return [trans_prob,emm_prob,start_prob,states,ob_type]
 
 def save(model):
@@ -248,3 +244,5 @@ def generate(model, numWords):
     
 
 
+=======
+>>>>>>> 5d8739c42c0319ea3d0ae87260ac6b4dbd03114e
