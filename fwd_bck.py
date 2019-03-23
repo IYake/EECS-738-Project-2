@@ -2,12 +2,12 @@
 Forward backward algorithm from:
 https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
 """
-import pprint
+import pprint as pp
 import pickle
 import random
+from itertools import product
 
 def trainHMM(num_states, observations, save_as = "train"):
-    # num_states = 2 #taken in with HMM parameters
     num_states = num_states
     observations = observations
 
@@ -31,6 +31,7 @@ def trainHMM(num_states, observations, save_as = "train"):
                 trans_prob[states[i]][states[j]] = ((1/num_states)-.01)
             else:
                 trans_prob[states[i]][states[j]] = (1/num_states)
+    # example:
     # trans_prob = {
     #         'S1' : {'S1':0.5, 'S2':0.49,'end':.01 },
     #         'S2' : {'S1':0.8, 'S2':0.19,'end':.01 }
@@ -95,10 +96,9 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 
     #assert p_fwd == p_bkw
     return fwd, bkw, posterior
-    #return posterior
 
 
-############### MAXIMIZATION STEP ##################
+# Maximation functions
 
 def update_start_prob(gammas):
     return gammas[0]
@@ -106,6 +106,7 @@ def update_start_prob(gammas):
 #get epsilon
 def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
     epsilons = {st1 : {st2 : {i : 0 for i in range(len(observations))} for st2 in states} for st1 in states}
+    
     denom = {i : 0 for i in range(len(observations))}
     for st1 in states:
         for st2 in states:
@@ -126,7 +127,7 @@ def update_trans_prob(epsilons,gammas,states,observations):
     for st in states:
         for i in range(len(observations)):
             denom[st] += gammas[i][st]
-
+    
     for st1 in states:
         for st2 in states:
             temp_trans[st1][st2] = 0
@@ -168,20 +169,11 @@ def update_em_prob(observations, gammas,states,ob_type):
 def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_type):
     #do this to log probability in the future
     for i in range(10):
-        # print(i)
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
         emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
-#        print("Iteration: %i" % (i+1))
-#        print("pi: ", start_prob)
-#        pprint.pprint(trans_prob)
-#        print("\n")
-#    print("EMM")
-#    pprint.pprint(emm_prob)
-#    print("Trans")
-#    pprint.pprint(trans_prob)
     return [trans_prob,emm_prob,start_prob,states,ob_type]
 
 def save(model, file_prefix):
@@ -207,15 +199,12 @@ def generate(model, numWords):
             j = ob_type.index(ob)
             emm_list[i][j] = emm_prob[st][ob]
             
-    #has higher dimensions with more hidden states. This is currently 2
     trans_list = [[0 for j in range(len(states))] for i in range(len(states))] #list form to be interpretated by choices()
     for st1 in states:
         i = states.index(st1)
         for st2 in states:
             j = states.index(st2)
             trans_list[i][j] = trans_prob[st1][st2]
-    
-    
     
     #find starting states
     start_prob_list = list(start_prob.values())
@@ -229,10 +218,11 @@ def generate(model, numWords):
         
     print(" ".join(generatedSentence))
     
-    
 if __name__ == "__main__":
     observations = ('N','N','N','N','N','E','E','N','N','N')
-    #model = trainHMM(2,observations, save_as = "testModel")
-    model = load("testModel.pickle")
-    pprint.pprint(model[0])
+    model = trainHMM(10,observations, save_as = "testModel")
+    generate(model,10)
+
+    
+
     
