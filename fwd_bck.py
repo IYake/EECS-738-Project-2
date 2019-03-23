@@ -6,7 +6,7 @@ import pprint
 import pickle
 import random
 
-def trainHMM(num_states, observations):
+def trainHMM(num_states, observations, save_as = "train"):
     # num_states = 2 #taken in with HMM parameters
     num_states = num_states
     observations = observations
@@ -47,7 +47,7 @@ def trainHMM(num_states, observations):
     #         }
     forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
     model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
-    save(model)
+    save(model, save_as)
     return model
 
 
@@ -184,8 +184,8 @@ def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_typ
 #    pprint.pprint(trans_prob)
     return [trans_prob,emm_prob,start_prob,states,ob_type]
 
-def save(model):
-    with open('train.pickle','wb') as f:
+def save(model, file_prefix):
+    with open(file_prefix+'.pickle','wb') as f:
         pickle.dump(model,f)
 
 def load(filename):
@@ -229,20 +229,10 @@ def generate(model, numWords):
         
     print(" ".join(generatedSentence))
     
-        
     
+if __name__ == "__main__":
+    observations = ('N','N','N','N','N','E','E','N','N','N')
+    #model = trainHMM(2,observations, save_as = "testModel")
+    model = load("testModel.pickle")
+    pprint.pprint(model[0])
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-=======
->>>>>>> 5d8739c42c0319ea3d0ae87260ac6b4dbd03114e
