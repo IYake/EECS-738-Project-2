@@ -9,17 +9,13 @@ def Exe(num_states, observations):
     # num_states = 2 #taken in with HMM parameters
     num_states = num_states
     observations = observations
-    # observations = ('N','N','N','N','N','E','E','N','N','N')
 
     string = 'S'
     states = [string+str(i) for i in range(1, num_states+1)]
-    # states = ('S1','S2')
     end_st = 'end'
 
-    ob_type = ["N", "E"]
-    # ob_type = list(dict.fromkeys(observations).keys())
+    ob_type = list(dict.fromkeys(observations).keys())
     #pi
-    start_prob = {'S1':0.5,'S2':0.5}
     start_prob = {}
     for i in range(len(states)):
         start_prob[states[i]]= (1/num_states)
@@ -49,7 +45,6 @@ def Exe(num_states, observations):
     #         'S2' : {'N':0.5,'E':0.5}
     #         }
     forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-    print("Before update")
     Update(observations, trans_prob, emm_prob, start_prob)
 
 
