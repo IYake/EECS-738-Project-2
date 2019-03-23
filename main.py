@@ -1,4 +1,4 @@
-from fwd_bck import trainHMM, save, load
+from fwd_bck import trainHMM, save, load, generate
 import pprint as pp
 import string
 import pandas as pd
@@ -24,8 +24,8 @@ def main():
                for word in sentence:
                    all_words.append(word)
     all_words = tuple(all_words)
-    model = trainHMM(2, all_words)
-    pp.pprint(model)
+    model = load('train.pickle')
+    generate(model,10)
     # model = load('train.pickle')
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@ https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
 """
 import pprint
 import pickle
+import random
 
 def trainHMM(num_states, observations):
     # num_states = 2 #taken in with HMM parameters
@@ -181,8 +182,7 @@ def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_typ
 #    pprint.pprint(emm_prob)
 #    print("Trans")
 #    pprint.pprint(trans_prob)
-
-    return [trans_prob,emm_prob,start_prob]
+    return [trans_prob,emm_prob,start_prob,states,ob_type]
 
 def save(model):
     with open('train.pickle','wb') as f:
@@ -192,3 +192,57 @@ def load(filename):
     with open(filename,'rb') as f:
         model = pickle.load(f)
     return model
+
+def generate(model, numWords):
+    trans_prob = model[0]
+    emm_prob = model[1]
+    start_prob = model[2]
+    states = model[3]
+    ob_type = model[4]
+    
+    emm_list = [[0 for j in range(len(ob_type))] for i in range(len(states))] #list form to be interpretated by choices()
+    for st in states:
+        i = states.index(st)
+        for ob in ob_type:
+            j = ob_type.index(ob)
+            emm_list[i][j] = emm_prob[st][ob]
+            
+    #has higher dimensions with more hidden states. This is currently 2
+    trans_list = [[0 for j in range(len(states))] for i in range(len(states))] #list form to be interpretated by choices()
+    for st1 in states:
+        i = states.index(st1)
+        for st2 in states:
+            j = states.index(st2)
+            trans_list[i][j] = trans_prob[st1][st2]
+    
+    
+    
+    #find starting states
+    start_prob_list = list(start_prob.values())
+    start_st = random.choices([i for i in range(len(start_prob_list))], start_prob_list,k=1)[0]
+    
+    generatedSentence = []
+    curr_st = start_st
+    for i in range(numWords):
+        generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
+        curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
+        
+    print(" ".join(generatedSentence))
+    
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+=======
+>>>>>>> 5d8739c42c0319ea3d0ae87260ac6b4dbd03114e
