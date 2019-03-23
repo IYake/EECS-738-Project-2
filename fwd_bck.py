@@ -2,10 +2,10 @@
 Forward backward algorithm from:
 https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
 """
-import numpy as np
 import pprint
+import pickle
 
-def Exe(num_states, observations):
+def trainHMM(num_states, observations):
     # num_states = 2 #taken in with HMM parameters
     num_states = num_states
     observations = observations
@@ -16,8 +16,7 @@ def Exe(num_states, observations):
     # states = ('S1','S2')
     end_st = 'end'
 
-    ob_type = ["N", "E"]
-    # ob_type = list(dict.fromkeys(observations).keys())
+    ob_type = list(dict.fromkeys(observations).keys())
     #pi
     start_prob = {'S1':0.5,'S2':0.5}
     start_prob = {}
@@ -49,8 +48,9 @@ def Exe(num_states, observations):
     #         'S2' : {'N':0.5,'E':0.5}
     #         }
     forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-    print("Before update")
-    Update(observations, trans_prob, emm_prob, start_prob)
+    model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
+    save(model)
+    return model
 
 
 def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
@@ -106,7 +106,7 @@ def update_start_prob(gammas):
     return gammas[0]
 
 #get epsilon
-def update_eps(forward,backward,observations,trans_prob,emm_prob):
+def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
     epsilons = {st1 : {st2 : {i : 0 for i in range(len(observations))} for st2 in states} for st1 in states}
     denom = {i : 0 for i in range(len(observations))}
     for st1 in states:
@@ -122,7 +122,7 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob):
                 epsilons[st1][st2][i] = eps / denom[i]
     return epsilons
 
-def update_trans_prob(epsilons,gammas):
+def update_trans_prob(epsilons,gammas,states,observations):
     temp_trans = {st1:{st2:0 for st2 in states}for st1 in states}
     denom = {st:0 for st in states}
     for st in states:
@@ -150,8 +150,8 @@ def update_trans_prob(epsilons,gammas):
             temp_trans[st1][st2] /= rowSum
     return temp_trans
 
-def update_em_prob(observations, gammas):
-    temp_em = {st1:{ob:0 for ob in ob_type}for st1 in states}
+def update_em_prob(observations, gammas,states,ob_type):
+    temp_em = {st1:{ob:0 for ob in ob_type} for st1 in states}
     denom = {st:0 for st in states}
     #denominator
     for st in states:
@@ -167,20 +167,33 @@ def update_em_prob(observations, gammas):
     return temp_em
 
 
-def Update(observations, trans_prob, emm_prob, start_prob):
+def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_type):
     #do this to log probability in the future
     for i in range(10):
         # print(i)
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-        epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob)
-        trans_prob = update_trans_prob(epsilons, gammas)
-        emm_prob = update_em_prob(observations, gammas)
+        epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
+        trans_prob = update_trans_prob(epsilons, gammas,states,observations)
+        emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
 #        print("Iteration: %i" % (i+1))
 #        print("pi: ", start_prob)
 #        pprint.pprint(trans_prob)
 #        print("\n")
-        print("EMM")
-        pprint.pprint(emm_prob)
-        print("Trans")
-        pprint.pprint(trans_prob)
+#    print("EMM")
+#    pprint.pprint(emm_prob)
+#    print("Trans")
+#    pprint.pprint(trans_prob)
+    
+    return [trans_prob,emm_prob,start_prob]
+
+def save(model):
+    with open('train.pickle','wb') as f:
+        pickle.dump(model,f)
+
+def load(filename):
+    with open(filename,'rb') as f:
+        model = pickle.load(f)
+    return model
+
+
