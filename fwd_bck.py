@@ -7,6 +7,8 @@ import pickle
 import random
 import sys
 import math
+import time
+from tqdm import tqdm
 
 def trainHMM(num_states, observations, save_as = "train"):
     num_states = num_states
@@ -242,15 +244,28 @@ def update_em_prob(observations, gammas,states,ob_type):
             temp_em[st1][ob] /= denom[st1]
     return temp_em
 
+#I *think*
+def likelihood(forward,backward,states):
+    likelihood = 0
+    for i in range(len(forward)):
+        temp_f = 0
+        temp_b = 0
+        for st in states:
+            temp_f += forward[i][st]
+            temp_b += backward[i][st]
+        likelihood += math.log10(temp_f)+math.log10(temp_b)
+    return likelihood
 
 def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_type):
     #do this to log probability in the future
-    for i in range(10):
+    for i in tqdm(range(200)):
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
         emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
+        #print("likelihood: ", likelihood(forward,backward,states))
+#        likelihood(forward,backward,states)
     return [trans_prob,emm_prob,start_prob,states,ob_type]
 
 def save(model, file_prefix = 'train'):
