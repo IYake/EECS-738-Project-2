@@ -101,8 +101,8 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 #    
 #    print("\n")
 #    print(fwd)
-    fwd, norm = normalize(fwd,states,len(observations))
-    f_curr = fwd[-1]
+#    fwd, norm = normalize(fwd,states,len(observations))
+#    f_curr = fwd[-1]
     #############################################################
 
     p_fwd = sum(f_curr[k] * trans_prob[k][end_st] for k in states)
@@ -127,9 +127,9 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     
     #############################################################
     #shift backward with forward's norm
-    for i in range(len(observations)):
-        for j in enumerate(states):
-            bkw[i][j[1]] /= norm[j[0]]
+#    for i in range(len(observations)):
+#        for j in enumerate(states):
+#            bkw[i][j[1]] /= norm[j[0]]
     ############################################################
     #p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
 
@@ -281,7 +281,7 @@ if __name__ == "__main__":
     
 #    print(model[0])
 #    print(model[1])
-#    generate(model,10)
+    generate(model,10)
 
     
 
