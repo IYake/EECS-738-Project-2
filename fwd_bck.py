@@ -41,7 +41,7 @@ def trainHMM(num_states, observations, save_as = "train"):
     for i in range(len(states)):
         for j in range(len(states)):
             trans_prob[states[i]][states[j]] = trans_prob[states[i]][states[j]]/trans_prob_sum[i]
-    #pp.pprint(trans_prob)
+
     # trans_prob = {}
     # for i in range(len(states)):
     #     trans_prob[states[i]] = {}
@@ -120,6 +120,10 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 
         bkw.insert(0,b_curr)
         b_prev = b_curr
+
+
+    # p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
+
     
     #############################################################
     #shift backward with forward's norm
@@ -128,6 +132,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             bkw[i][j[1]] /= norm[j[0]]
     ############################################################
     #p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
+
 
     # merging the two parts
     posterior = []
