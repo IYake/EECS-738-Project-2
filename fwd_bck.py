@@ -68,12 +68,12 @@ def trainHMM(num_states, observations, save_as = "train"):
     #         'S2' : {'N':0.5,'E':0.5}
     #         }
     forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-    
+
 #    pp.pprint(forward)
 #    print("\n\n")
 #    forward = normalize(forward,states,num_obs)[0]
 #    pp.pprint(forward)
-    
+
     model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
     save(model, file_prefix = save_as)
     return model
@@ -115,12 +115,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 
         bkw.insert(0,b_curr)
         b_prev = b_curr
-<<<<<<< HEAD
-    pp.pprint(bkw)
 
-    # p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
-=======
-    
     #############################################################
     #shift backward with forward's norm
     for i in range(len(observations)):
@@ -128,7 +123,6 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             bkw[i][j[1]] /= norm[j[0]]
     ############################################################
     #p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
->>>>>>> 1dac5c6b2ea7fa693a9506e8d52bdf90c3d58f3e
 
     # merging the two parts
     posterior = []
@@ -258,7 +252,7 @@ def generate(model, numWords):
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
 
     print(" ".join(generatedSentence))
-    
+
 def normalize(v,states,num_obs):
     norm = [0 for i in range(len(states))]
     for i in range(num_obs):
@@ -269,15 +263,12 @@ def normalize(v,states,num_obs):
             v[i][j[1]] /= norm[j[0]]
     return v,norm
 
-    
+
 if __name__ == "__main__":
     observations = ('N','N','N','N','N','E','E','N','N','N')
     model = trainHMM(2,observations, save_as = "testModel")
     print(model[1])
-    
+
 #    print(model[0])
 #    print(model[1])
 #    generate(model,10)
-
-    
-
