@@ -14,7 +14,7 @@ def main():
     observations = ['N','N','N','N','N','E','E','N','N','N']
     observations = tuple(observations)
     all_words =[]
-    for i in range(20):#range(len(obs)):
+    for i in range(200):#range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
            # print(sentence)
@@ -32,9 +32,9 @@ def main():
 #        if word == "":
 #            print("")
     all_words = tuple(all_words)
-    model = trainHMM(2,all_words, save_as = "test_jg")
-    model = load('test_jg.pickle')
-    generate(model,100)
+#    model = trainHMM(20,all_words, save_as = "model2")
+    model = load('model1.pickle')
+    generate(model,20)
     # model = load('train.pickle')
 if __name__ == "__main__":
     main()

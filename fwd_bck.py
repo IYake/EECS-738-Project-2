@@ -115,8 +115,10 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     # backward part of the algorithm
     bkw = []
     b_prev = {}
+    c_test_for_b = []
     for i, observation_i_plus in enumerate(reversed(observations[1:]+(None,))):
         b_curr = {}
+        c_test_for_b.append(0)
         for st in states:
             if i == 0:
                 # base case for backward part
@@ -124,8 +126,12 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             else:
                 b_curr[st] = sum(trans_prob[st][l] * emm_prob[l][observation_i_plus] * b_prev[l] for l in states)
         #scaling value
+        #####################################
         for st in states:
-            b_curr[st] = b_curr[st] / c[i]
+            c_test_for_b[i] += b_curr[st]
+        for st in states:
+            b_curr[st] = b_curr[st] / c_test_for_b[i]
+#        print(c)
         bkw.insert(0,b_curr)
         b_prev = b_curr
 
@@ -161,10 +167,10 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
                 denom[i] += forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
             
-    print("forward: ", forward,end="\n\n")
-    print("trans_prob: ",trans_prob,end="\n\n")
-    print("backward: ",backward,end="\n\n")
-    print("emm_prob: ",emm_prob,end="\n\n")
+#    print("forward: ", forward,end="\n\n")
+#    print("trans_prob: ",trans_prob,end="\n\n")
+#    print("backward: ",backward,end="\n\n")
+#    print("emm_prob: ",emm_prob,end="\n\n")
     
     # pp.pprint(denom)
     for st1 in states:
