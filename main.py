@@ -2,7 +2,8 @@ from fwd_bck import trainHMM, save, load, generate
 import pprint as pp
 import string
 import pandas as pd
-import sys
+#import sys
+import math
 
 def main():
     #read in the data
@@ -13,7 +14,7 @@ def main():
     observations = ['N','N','N','N','N','E','E','N','N','N']
     observations = tuple(observations)
     all_words =[]
-    for i in range(21):#range(len(obs)):
+    for i in range(20):#range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
            # print(sentence)
@@ -26,10 +27,14 @@ def main():
            else:
                for word in sentence:
                    all_words.append(word.lower())
+#    print(all_words)
+#    for word in all_words:
+#        if word == "":
+#            print("")
     all_words = tuple(all_words)
     model = trainHMM(2,all_words, save_as = "test_jg")
     model = load('test_jg.pickle')
-    generate(model,10)
+    generate(model,100)
     # model = load('train.pickle')
 if __name__ == "__main__":
     main()
