@@ -41,7 +41,7 @@ def trainHMM(num_states, observations, save_as = "train"):
     for i in range(len(states)):
         for j in range(len(states)):
             trans_prob[states[i]][states[j]] = trans_prob[states[i]][states[j]]/trans_prob_sum[i]
-    pp.pprint(trans_prob)
+    #pp.pprint(trans_prob)
     # trans_prob = {}
     # for i in range(len(states)):
     #     trans_prob[states[i]] = {}
@@ -97,7 +97,12 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         f_prev = f_curr
     ##############################################################
     #normalize forward
+#    print("f_curr: ", f_curr)
+#    
+#    print("\n")
+#    print(fwd)
     fwd, norm = normalize(fwd,states,len(observations))
+    f_curr = fwd[-1]
     #############################################################
 
     p_fwd = sum(f_curr[k] * trans_prob[k][end_st] for k in states)
@@ -267,7 +272,7 @@ def normalize(v,states,num_obs):
 if __name__ == "__main__":
     observations = ('N','N','N','N','N','E','E','N','N','N')
     model = trainHMM(2,observations, save_as = "testModel")
-    print(model[1])
+    #print(model[1])
     
 #    print(model[0])
 #    print(model[1])
