@@ -16,21 +16,42 @@ def trainHMM(num_states, observations, save_as = "train"):
     end_st = 'end'
 
     ob_type = list(dict.fromkeys(observations).keys())
+
+
     #pi
     start_prob = {}
+    #randomizing the inintal values of start_prob aka pi
+    start_prob_sum = 0
     for i in range(len(states)):
-        start_prob[states[i]]= (1/num_states)
+        start_prob[states[i]]= random.randrange(0,1000)
+        start_prob_sum += start_prob[states[i]]
+    for i in range(len(states)):
+        start_prob[states[i]] = start_prob[states[i]]/start_prob_sum
 
     trans_prob = {}
+    trans_prob_sum = [0.01 for _ in range(len(states))]
     for i in range(len(states)):
         trans_prob[states[i]] = {}
         for j in range(len(states)+1):
             if j == len(states):
                 trans_prob[states[i]][end_st] = .01
-            elif j== len(states) -1:
-                trans_prob[states[i]][states[j]] = ((1/num_states)-.01)
             else:
-                trans_prob[states[i]][states[j]] = (1/num_states)
+                trans_prob[states[i]][states[j]] = random.randrange(0,1000)
+                trans_prob_sum[i] += trans_prob[states[i]][states[j]]
+    for i in range(len(states)):
+        for j in range(len(states)):
+            trans_prob[states[i]][states[j]] = trans_prob[states[i]][states[j]]/trans_prob_sum[i]
+    pp.pprint(trans_prob)
+    # trans_prob = {}
+    # for i in range(len(states)):
+    #     trans_prob[states[i]] = {}
+    #     for j in range(len(states)+1):
+    #         if j == len(states):
+    #             trans_prob[states[i]][end_st] = .01
+    #         elif j== len(states) -1:
+    #             trans_prob[states[i]][states[j]] = ((1/num_states)-.01)
+    #         else:
+    #             trans_prob[states[i]][states[j]] = (1/num_states)
     # example:
     # trans_prob = {
     #         'S1' : {'S1':0.5, 'S2':0.49,'end':.01 },
