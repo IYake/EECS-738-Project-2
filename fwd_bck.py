@@ -81,6 +81,7 @@ def trainHMM(num_states, observations, save_as = "train"):
 
 def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     # forward part of the algorithm
+    c = []
     fwd = []
     f_prev = {}
     for i, observation_i in enumerate(observations):
@@ -92,6 +93,12 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             else:
                 prev_f_sum = sum(f_prev[k]*trans_prob[k][st] for k in states)
             f_curr[st] = emm_prob[st][observation_i] * prev_f_sum
+        #scaling value
+        c.append(0)
+        for st in states:
+            c[i] += f_curr[st]
+        for st in states:
+            f_curr[st] = f_curr[st] / c[i]
 
         fwd.append(f_curr)
         f_prev = f_curr
@@ -101,8 +108,8 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 #
 #    print("\n")
 #    print(fwd)
-    fwd, norm = normalize(fwd,states,len(observations))
-    f_curr = fwd[-1]
+    # fwd, norm = normalize(fwd,states,len(observations))
+    # f_curr = fwd[-1]
     #############################################################
 
     p_fwd = sum(f_curr[k] * trans_prob[k][end_st] for k in states)
@@ -117,7 +124,9 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
                 b_curr[st] = trans_prob[st][end_st]
             else:
                 b_curr[st] = sum(trans_prob[st][l] * emm_prob[l][observation_i_plus] * b_prev[l] for l in states)
-
+        #scaling value
+        for st in states:
+            b_curr[st] = b_curr[st]/c[i]
         bkw.insert(0,b_curr)
         b_prev = b_curr
 
@@ -127,9 +136,9 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
 
     #############################################################
     #shift backward with forward's norm
-    for i in range(len(observations)):
-        for j in enumerate(states):
-            bkw[i][j[1]] /= norm[j[0]]
+    # for i in range(len(observations)):
+    #     for j in enumerate(states):
+    #         bkw[i][j[1]] /= norm[j[0]]
     ############################################################
     #p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
 
@@ -140,6 +149,8 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         posterior.append({st: fwd[i][st] * bkw[i][st] / p_fwd for st in states})
 
     #assert p_fwd == p_bkw
+    # pp.pprint(fwd)
+    # pp.pprint(bkw)
     return fwd, bkw, posterior
 
 
@@ -158,6 +169,7 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
             for i in range(len(observations)-1):
                 denom[i] += forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
+    # pp.pprint(denom)
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
@@ -281,4 +293,4 @@ if __name__ == "__main__":
 
 #    print(model[0])
 #    print(model[1])
-#    generate(model,10)
+    generate(model,100)

@@ -13,7 +13,7 @@ def main():
     observations = ['N','N','N','N','N','E','E','N','N','N']
     observations = tuple(observations)
     all_words =[]
-    for i in range(28):#range(len(obs)):
+    for i in range(20):#range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
            # print(sentence)
