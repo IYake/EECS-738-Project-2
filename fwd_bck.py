@@ -7,10 +7,11 @@ import pickle
 import random
 import sys
 import math
+import string
 #import time
 from tqdm import tqdm
 
-def trainHMM(num_states, observations, num_iters, speakers, save_as = "train"):
+def trainHMM(num_states, observations, num_iters, save_as = "train"):
     num_states = num_states
     observations = observations
     string = 'S'
@@ -285,7 +286,7 @@ def load(filename):
         model = pickle.load(f)
     return model
 
-def generate(model, numWords, speakers):
+def generate(model, numWords):
     trans_prob = model[0]
     emm_prob = model[1]
     start_prob = model[2]
@@ -315,9 +316,17 @@ def generate(model, numWords, speakers):
     for i in range(numWords):
         generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
+        # print("\n\n", ''.join(generatedSentence))
+    for i in range(numWords):
+        if generatedSentence[i].isupper():
+            # continue
+            print("\n", ''.join(generatedSentence[i]).lstrip(), ": ", end = "")
+        elif i == numWords-1:
+            print(''.join(generatedSentence[i]), end = "\n")
+        else:
+            print(''.join(generatedSentence[i]), end = " ")
 
-
-    print(" ".join(generatedSentence))
+    # print(" ".join(generatedSentence))
 
 #given a sequence of text, predict the words that come after
 #using the trained model
@@ -373,4 +382,4 @@ if __name__ == "__main__":
     observations = tuple([random.choices(['N','E'],[8,2],k=1)[0] for i in range(10)])
     model = trainHMM(2,observations, save_as = "testModel")
 
-    generate(model,10, speakers)
+    generate(model,10)

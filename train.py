@@ -13,16 +13,15 @@ def train():
     # pp.pprint(df)
     obs = df.values.tolist()
     obs = [tuple(x) for x in df.values]
-    # pp.pprint(obs)
     all_words = []
 
     #hyper parameters
     hidden_states = 10
     lines = 100
-    num_iters = 300
+    num_iters = 200
     speakers = []
     for i in range(lines):#range(len(obs)):
-       for j in range(1,len(obs[i])):
+       for j in range(len(obs[i])):
            sentence = obs[i][j].split()
            if sentence == []:
                continue
@@ -37,7 +36,7 @@ def train():
            speakers.append(obs[i][0])
     all_words = tuple(all_words)
     #trainHMM(hidden_states,all_words, save_as = "model"+str(hidden_states)+"_"+str(lines))
-    trainHMM(hidden_states,all_words, num_iters, speakers, save_as = "hmm")
+    trainHMM(hidden_states,all_words, num_iters, save_as = "hmm")
    # model = load("model"+str(hidden_states)+str(lines)+".pickle")
     #generate(model,15)
 
