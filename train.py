@@ -7,9 +7,9 @@ import re
 def train():
 
     #read in the data
-    col = "PlayerLine"
+    # col = "PlayerLine"
+    # df = pd.read_csv('Shakespeare_data.csv', usecols=[col])
     df = pd.read_table('movie_lines.txt',header=None,sep=' \+\+\+\$\+\+\+ ', engine='python', usecols=[4])
-    pp.pprint(df)
     # pp.pprint(df)
     obs = df.values.tolist()
     obs = [tuple(x) for x in df.values]
@@ -38,4 +38,3 @@ def train():
 
 # if __name__ == "__main__":
 #     # train()
-train()
