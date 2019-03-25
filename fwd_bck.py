@@ -10,7 +10,7 @@ import math
 #import time
 from tqdm import tqdm
 
-def trainHMM(num_states, observations, save_as = "train"):
+def trainHMM(num_states, observations, num_iters, speakers, save_as = "train"):
     num_states = num_states
     observations = observations
     string = 'S'
@@ -63,7 +63,7 @@ def trainHMM(num_states, observations, save_as = "train"):
     forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
 
 
-    model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
+    model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type, num_iters)
     save(model, file_prefix = save_as)
     return model
 
@@ -147,7 +147,7 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
             for i in range(len(observations)-1):
                 denom[i] += forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
-    
+
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
@@ -175,7 +175,7 @@ def update_trans_prob(epsilons,gammas,states,observations):
                 pass
                 temp_trans[st1][st2] += epsilons[st1][st2][i]
             temp_trans[st1][st2] /= denom[st1]
-        
+
     for st in states:
         temp_trans[st]['end'] = 0.01
 
@@ -210,7 +210,7 @@ def likelihood(forward,states):
         likelihood += forward[-1][st]
     return likelihood
 
-def Update(obs, trans, emm, start, sts, end,ob_types):
+def Update(obs, trans, emm, start, sts, end,ob_types, num_iters):
     #do this to log probability in the future
     print("Training:")
     forward = None
@@ -225,7 +225,7 @@ def Update(obs, trans, emm, start, sts, end,ob_types):
     states = sts
     end_st = end
     ob_type = ob_types
-    for i in tqdm(range(100)):
+    for i in tqdm(range(num_iters)):
         forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
@@ -244,7 +244,7 @@ def load(filename):
         model = pickle.load(f)
     return model
 
-def generate(model, numWords):
+def generate(model, numWords, speakers):
     trans_prob = model[0]
     emm_prob = model[1]
     start_prob = model[2]
@@ -281,5 +281,4 @@ if __name__ == "__main__":
     observations = tuple([random.choices(['N','E'],[8,2],k=1)[0] for i in range(10)])
     model = trainHMM(2,observations, save_as = "testModel")
 
-    generate(model,10)
-
+    generate(model,10, speakers)
