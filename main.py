@@ -19,10 +19,10 @@ def main():
             numWords = int(input())
             generate(model,numWords)
         if (choice == "2"):
-            #print("Enter your sequence of words: ")
-            #sequence = input()
-            sequence = ('enter','the')
+            print("Enter your sequence of words: ")
+            sequence = tuple(input().split())
             predict(model,20,sequence)
+        print("------------------------")
     
 if __name__ == "__main__":
     main()
