@@ -6,6 +6,7 @@ import pandas as pd
 import math
 
 def main():
+    
     #read in the data
     col = "PlayerLine"
     df = pd.read_csv('Shakespeare_data.csv', usecols = [col])
@@ -14,10 +15,13 @@ def main():
     observations = ['N','N','N','N','N','E','E','N','N','N']
     observations = tuple(observations)
     all_words =[]
-    for i in range(100):#range(len(obs)):
+    
+    #hyper parameters
+    hidden_states = 3
+    lines = 5
+    for i in range(lines):#range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
-           # print(sentence)
            if sentence == []:
                continue
            if sentence[0].strip() == "SCENE":
@@ -27,14 +31,9 @@ def main():
            else:
                for word in sentence:
                    all_words.append(word.lower())
-#    print(all_words)
-#    for word in all_words:
-#        if word == "":
-#            print("")
     all_words = tuple(all_words)
-    model = trainHMM(5,all_words, save_as = "model7")
-    model = load('model7.pickle')
+    model = trainHMM(hidden_states,all_words, save_as = "model"+str(hidden_states)+str(lines))
+    #model = load('model8.pickle')
     generate(model,30)
-    # model = load('train.pickle')
 if __name__ == "__main__":
     main()

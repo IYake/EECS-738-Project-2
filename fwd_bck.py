@@ -59,7 +59,8 @@ def trainHMM(num_states, observations, save_as = "train"):
     #         'S1' : {'N':0.5,'E':0.5},
     #         'S2' : {'N':0.5,'E':0.5}
     #         }
-    forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
+    #is this fwd_bck necessary?
+    forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
 
 
     model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
@@ -71,6 +72,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     # forward part of the algorithm
     c = []
     fwd = []
+    likelihood = 0
     f_prev = {}
     for i, observation_i in enumerate(observations):
         f_curr = {}
@@ -83,6 +85,9 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             f_curr[st] = emm_prob[st][observation_i] * prev_f_sum
         #scaling value
         c.append(0)
+        if i == len(observations)-1:
+            for st in states:
+                likelihood += f_curr[st]
         for st in states:
             c[i] += f_curr[st]
         for st in states:
@@ -124,7 +129,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         posterior.append({st: fwd[i][st] * bkw[i][st] / p_fwd for st in states})
 
     #assert p_fwd == p_bkw
-    return fwd, bkw, posterior
+    return fwd, bkw, posterior,likelihood
 
 
 # Maximation functions
@@ -199,22 +204,36 @@ def update_em_prob(observations, gammas,states,ob_type):
             temp_em[st1][ob] /= denom[st1]
     return temp_em
 
-def likelihood(forward,backward,states):
+def likelihood(forward,states):
     likelihood = 0
     for st in states:
         likelihood += forward[-1][st]
     return likelihood
 
-def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_type):
+def Update(obs, trans, emm, start, sts, end,ob_types):
     #do this to log probability in the future
     print("Training:")
-    for i in tqdm(range(100)):
-        forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
+    forward = None
+    backward = None
+    gammas = None
+    likelihood = None
+    epsilons = None
+    observations = obs
+    trans_prob = trans
+    emm_prob = emm
+    start_prob = start
+    states = sts
+    end_st = end
+    ob_type = ob_types
+    for i in tqdm(range(10000)):
+        forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
         emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
-    return [trans_prob,emm_prob,start_prob,states,ob_type]
+    print("Likelihood: ", likelihood) #need to scale this back
+    #return trained model
+    return [trans_prob,emm_prob,start_prob,states,ob_type, likelihood]
 
 def save(model, file_prefix = 'train'):
     with open(file_prefix+'.pickle','wb') as f:
