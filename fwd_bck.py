@@ -119,10 +119,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         bkw.insert(0,b_curr)
         b_prev = b_curr
 
-
     # p_bkw = sum(start_prob[l] * emm_prob[l][observations[0]] * b_curr[l] for l in states)
-
-
     # merging the two parts
     posterior = []
     for i in range(len(observations)):
@@ -131,7 +128,51 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     #assert p_fwd == p_bkw
     return fwd, bkw, posterior,likelihood
 
+#https://en.wikipedia.org/wiki/Viterbi_algorithm
+def viterbi(obs, states, start_p, trans_p, emit_p):
+    V = [{}]
+    for st in states:
+        V[0][st] = {"prob": start_p[st] * emit_p[st][obs[0]], "prev": None}
+    # Run Viterbi when t > 0
+    for t in range(1, len(obs)):
+        V.append({})
+        for st in states:
+            max_tr_prob = V[t-1][states[0]]["prob"]*trans_p[states[0]][st]
+            prev_st_selected = states[0]
+            for prev_st in states[1:]:
+                tr_prob = V[t-1][prev_st]["prob"]*trans_p[prev_st][st]
+                if tr_prob > max_tr_prob:
+                    max_tr_prob = tr_prob
+                    prev_st_selected = prev_st
+                    
+            max_prob = max_tr_prob * emit_p[st][obs[t]]
+            V[t][st] = {"prob": max_prob, "prev": prev_st_selected}
+                    
+#    for line in dptable(V):
+#        print(line)
+    opt = []
+    # The highest probability
+    max_prob = max(value["prob"] for value in V[-1].values())
+    previous = None
+    # Get most probable state and its backtrack
+    for st, data in V[-1].items():
+        if data["prob"] == max_prob:
+            opt.append(st)
+            previous = st
+            break
+    # Follow the backtrack till the first observation
+    for t in range(len(V) - 2, -1, -1):
+        opt.insert(0, V[t + 1][previous]["prev"])
+        previous = V[t + 1][previous]["prev"]
 
+#    print('The steps of states are ' + ' '.join(opt) + ' with highest probability of %s' % max_prob)
+    return opt
+
+def dptable(V):
+    # Print a table of steps from dictionary
+    yield " ".join(("%12d" % i) for i in range(len(V)))
+    for state in V[0]:
+        yield "%.7s: " % state + " ".join("%.7s" % ("%f" % v[state]["prob"]) for v in V)
 # Maximation functions
 
 def update_start_prob(gammas):
@@ -204,12 +245,6 @@ def update_em_prob(observations, gammas,states,ob_type):
             temp_em[st1][ob] /= denom[st1]
     return temp_em
 
-def likelihood(forward,states):
-    likelihood = 0
-    for st in states:
-        likelihood += forward[-1][st]
-    return likelihood
-
 def Update(obs, trans, emm, start, sts, end,ob_types):
     #do this to log probability in the future
     print("Training:")
@@ -275,8 +310,59 @@ def generate(model, numWords):
         generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
 
-    print(" ".join(generatedSentence))
 
+    print(" ".join(generatedSentence))
+    
+#given a sequence of text, predict the words that come after
+#using the trained model
+def predict(model,numWords,observations):
+    trans_prob = model[0]
+    emm_prob = model[1]
+    start_prob = model[2]
+    states = model[3]
+    ob_type = model[4]
+    
+    #make lists from dictionaries to predict text if necessary
+    emm_list = [[0 for j in range(len(ob_type))] for i in range(len(states))] #list form to be interpretated by choices()
+    for st in states:
+        i = states.index(st)
+        for ob in ob_type:
+            j = ob_type.index(ob)
+            emm_list[i][j] = emm_prob[st][ob]
+
+    trans_list = [[0 for j in range(len(states))] for i in range(len(states))] #list form to be interpretated by choices()
+    for st1 in states:
+        i = states.index(st1)
+        for st2 in states:
+            j = states.index(st2)
+            trans_list[i][j] = trans_prob[st1][st2]
+
+#    #find starting states
+#    start_prob_list = list(start_prob.values())
+#    start_st = random.choices([i for i in range(len(start_prob_list))], start_prob_list,k=1)[0]
+    
+    
+    wordsInData = True
+    for i in range(len(observations)):
+        if observations[i] not in list(emm_prob[states[0]].keys()):
+            print("\""+observations[i]+"\" not seen in data set. Try again\n")
+            wordsInData = False
+            break
+        
+    if wordsInData:
+     #find most likely sequence of states 
+        opt = viterbi(observations,states,start_prob,trans_prob,emm_prob)
+        last_state = opt[-1]
+        
+        prediction = []
+        curr_st = int(last_state[1:]) #remove 'S' and convert to int
+        for i in range(numWords):
+            prediction.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
+            curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
+        
+        print(" ".join(prediction))
+
+    
 if __name__ == "__main__":
     observations = tuple([random.choices(['N','E'],[8,2],k=1)[0] for i in range(10)])
     model = trainHMM(2,observations, save_as = "testModel")
