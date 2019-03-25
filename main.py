@@ -14,11 +14,11 @@ def main():
     obs = [tuple(x) for x in df.values]
     observations = ['N','N','N','N','N','E','E','N','N','N']
     observations = tuple(observations)
-    all_words =[]
+    all_words = []
     
     #hyper parameters
-    hidden_states = 3
-    lines = 5
+    hidden_states = 5
+    lines = 100
     for i in range(lines):#range(len(obs)):
        for j in range(len(obs[i])):
            sentence = obs[i][j].translate(str.maketrans('', '', string.punctuation)).split()
@@ -33,7 +33,7 @@ def main():
                    all_words.append(word.lower())
     all_words = tuple(all_words)
     model = trainHMM(hidden_states,all_words, save_as = "model"+str(hidden_states)+str(lines))
-    #model = load('model8.pickle')
-    generate(model,30)
+    model = load("model"+str(hidden_states)+str(lines)+".pickle")
+    generate(model,15)
 if __name__ == "__main__":
     main()

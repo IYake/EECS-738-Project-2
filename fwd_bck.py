@@ -225,13 +225,13 @@ def Update(obs, trans, emm, start, sts, end,ob_types):
     states = sts
     end_st = end
     ob_type = ob_types
-    for i in tqdm(range(10000)):
+    for i in tqdm(range(100)):
         forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
         emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
-    print("Likelihood: ", likelihood) #need to scale this back
+    #print("Likelihood: ", likelihood) #need to scale this back
     #return trained model
     return [trans_prob,emm_prob,start_prob,states,ob_type, likelihood]
 
