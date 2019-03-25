@@ -7,13 +7,12 @@ import pickle
 import random
 import sys
 import math
-import time
+#import time
 from tqdm import tqdm
 
 def trainHMM(num_states, observations, save_as = "train"):
     num_states = num_states
     observations = observations
-    num_obs = len(observations)
     string = 'S'
     states = [string+str(i) for i in range(1, num_states+1)]
     end_st = 'end'
@@ -45,16 +44,6 @@ def trainHMM(num_states, observations, save_as = "train"):
         for j in range(len(states)):
             trans_prob[states[i]][states[j]] = trans_prob[states[i]][states[j]]/trans_prob_sum[i]
 
-    # trans_prob = {}
-    # for i in range(len(states)):
-    #     trans_prob[states[i]] = {}
-    #     for j in range(len(states)+1):
-    #         if j == len(states):
-    #             trans_prob[states[i]][end_st] = .01
-    #         elif j== len(states) -1:
-    #             trans_prob[states[i]][states[j]] = ((1/num_states)-.01)
-    #         else:
-    #             trans_prob[states[i]][states[j]] = (1/num_states)
     # example:
     # trans_prob = {
     #         'S1' : {'S1':0.5, 'S2':0.49,'end':.01 },
@@ -72,10 +61,6 @@ def trainHMM(num_states, observations, save_as = "train"):
     #         }
     forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
 
-#    pp.pprint(forward)
-#    print("\n\n")
-#    forward = normalize(forward,states,num_obs)[0]
-#    pp.pprint(forward)
 
     model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type)
     save(model, file_prefix = save_as)
@@ -107,13 +92,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         f_prev = f_curr
 
     p_fwd = sum(f_curr[k] * trans_prob[k][end_st] for k in states)
-#    print(fwd,end="\n\n")
-    if (hasNanT(trans_prob,states)):
-        print("trans_prob")
-        sys.exit()
-    if (hasNan(fwd,states,len(observations))):
-        print("fwd")
-        sys.exit()
+
     # backward part of the algorithm
     bkw = []
     b_prev = {}
@@ -128,12 +107,10 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
             else:
                 b_curr[st] = sum(trans_prob[st][l] * emm_prob[l][observation_i_plus] * b_prev[l] for l in states)
         #scaling value
-        #####################################
         for st in states:
             c_test_for_b[i] += b_curr[st]
         for st in states:
             b_curr[st] = b_curr[st] / c_test_for_b[i]
-#        print(c)
         bkw.insert(0,b_curr)
         b_prev = b_curr
 
@@ -147,15 +124,12 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
         posterior.append({st: fwd[i][st] * bkw[i][st] / p_fwd for st in states})
 
     #assert p_fwd == p_bkw
-    # pp.pprint(fwd)
-    # pp.pprint(bkw)
     return fwd, bkw, posterior
 
 
 # Maximation functions
 
 def update_start_prob(gammas):
-#    print(gammas[0])
     return gammas[0]
 
 #get epsilon
@@ -168,13 +142,7 @@ def update_eps(forward,backward,observations,trans_prob,emm_prob,states):
             for i in range(len(observations)-1):
                 denom[i] += forward[i][st1]*trans_prob[st1][st2]              \
                       *backward[i+1][st2]*emm_prob[st2][observations[i+1]]
-            
-#    print("forward: ", forward,end="\n\n")
-#    print("trans_prob: ",trans_prob,end="\n\n")
-#    print("backward: ",backward,end="\n\n")
-#    print("emm_prob: ",emm_prob,end="\n\n")
     
-    # pp.pprint(denom)
     for st1 in states:
         for st2 in states:
             for i in range(len(observations)-1):#can't assign last value
@@ -189,10 +157,7 @@ def update_trans_prob(epsilons,gammas,states,observations):
     for st in states:
         for i in range(len(observations)):
             denom[st] += gammas[i][st]
-            
-    if (hasNanD(denom,states)):
-        print("denom has NaN")
-#        sys.quit()
+
     for st in states:
         if 0 in denom.keys():
             print("denom has zero")
@@ -205,16 +170,6 @@ def update_trans_prob(epsilons,gammas,states,observations):
                 pass
                 temp_trans[st1][st2] += epsilons[st1][st2][i]
             temp_trans[st1][st2] /= denom[st1]
-
-#    pp.pprint(temp_trans)
-    
-    if (hasNanE(epsilons,states,len(observations))):
-        print("epsilon has Nan")
-#        sys.quit()
-            
-    if  (hasNanT(temp_trans,states)):
-        print("temp_trans has NaN")
-#        sys.quit()
         
     for st in states:
         temp_trans[st]['end'] = 0.01
@@ -244,28 +199,21 @@ def update_em_prob(observations, gammas,states,ob_type):
             temp_em[st1][ob] /= denom[st1]
     return temp_em
 
-#I *think*
 def likelihood(forward,backward,states):
     likelihood = 0
-    for i in range(len(forward)):
-        temp_f = 0
-        temp_b = 0
-        for st in states:
-            temp_f += forward[i][st]
-            temp_b += backward[i][st]
-        likelihood += math.log10(temp_f)+math.log10(temp_b)
+    for st in states:
+        likelihood += forward[-1][st]
     return likelihood
 
 def Update(observations, trans_prob, emm_prob, start_prob, states, end_st,ob_type):
     #do this to log probability in the future
-    for i in tqdm(range(200)):
+    print("Training:")
+    for i in tqdm(range(100)):
         forward, backward, gammas = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
         epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
         trans_prob = update_trans_prob(epsilons, gammas,states,observations)
         emm_prob = update_em_prob(observations, gammas,states,ob_type)
         start_prob = update_start_prob(gammas)
-        #print("likelihood: ", likelihood(forward,backward,states))
-#        likelihood(forward,backward,states)
     return [trans_prob,emm_prob,start_prob,states,ob_type]
 
 def save(model, file_prefix = 'train'):
@@ -310,44 +258,8 @@ def generate(model, numWords):
 
     print(" ".join(generatedSentence))
 
-def normalize(v,states,num_obs):
-    norm = [0 for i in range(len(states))]
-    for i in range(num_obs):
-        for j in enumerate(states):
-            norm[j[0]] += v[i][j[1]]
-    for i in range(num_obs):
-        for j in enumerate(states):
-            v[i][j[1]] /= norm[j[0]]
-    return v,norm
-
-def hasNan(fwd, states, num_obs):
-    for i in range(num_obs):
-        for st in states:
-            if math.isnan(fwd[i][st]):
-                return True
-def hasNanT(trans,states):
-    for st in states:
-        for st2 in states:
-            if math.isnan(trans[st][st2]):
-                return True
-            
-def hasNanD(denom,states):
-    for st in states: 
-        if math.isnan(denom[st]):
-            return True
-
-def hasNanE(epsilon,states,num_obs):
-    for st1 in states:
-        for st2 in states:
-            for i in range(num_obs-1):
-                if math.isnan(epsilon[st1][st2][i]):
-                    return True
-
 if __name__ == "__main__":
-#    observations = ('N','N','N','N','N','E','E','N','N','N')
-#    observations = tuple(['N','N','N','N','N','E','E','N','N','N'])
     observations = tuple([random.choices(['N','E'],[8,2],k=1)[0] for i in range(10)])
-#    print(observations)
     model = trainHMM(2,observations, save_as = "testModel")
 
     generate(model,10)

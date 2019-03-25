@@ -32,8 +32,8 @@ def main():
 #        if word == "":
 #            print("")
     all_words = tuple(all_words)
-    model = trainHMM(5,all_words, save_as = "model6")
-    model = load('model6.pickle')
+    model = trainHMM(5,all_words, save_as = "model7")
+    model = load('model7.pickle')
     generate(model,30)
     # model = load('train.pickle')
 if __name__ == "__main__":
