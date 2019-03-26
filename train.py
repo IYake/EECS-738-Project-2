@@ -10,9 +10,9 @@ def train():
     all_words = []
 
     #hyper parameters
-    hidden_states = 5
-    lines = 100
-    num_iters = 50
+    hidden_states = 50
+    lines = 5
+    num_iters = 10
     speakers = []
     for i in range(lines):
        for j in range(len(obs[i])):
