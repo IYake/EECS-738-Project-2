@@ -28,6 +28,10 @@ To run this project, run `python main.py`. This command will prompt the user cho
 to either 1) generate n new words of text or 2) predict the next n words
 of text following the user's input. 
 
+# Sample Output
+### Text Generation
+![pic1](sample\ output/Text_Gen.png)
+
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
 
