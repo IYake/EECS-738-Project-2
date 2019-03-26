@@ -5,7 +5,7 @@ Create a Hidden Markov Model to generate new text from a text corpus and perform
 For this project we used the Baum-Welch algorithm to train a Hidden Markov Model. Once the model was trained, we used the transition matrix and the emission matrix to predict the next n number of words. 
 
 # Dataset:
-http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
+For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html)
 
 # How to Compile:
 Our project uses Python 3.7.1 with the modules: pickle, random, sys, math, tqdm, pandas.
