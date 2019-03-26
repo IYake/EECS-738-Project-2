@@ -2,7 +2,7 @@
 Create a Hidden Markov Model to generate new text from a text corpus and perform text prediction given a sequence of words. 
 
 # Training Approach
-For this project we used the [Baum-Welch algorithm](https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm) to train a Hidden Markov Model. For numerical stability, we added scaling factors to the forward backward probabilities in the (forward-backward algorithm)[https://en.m.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm].
+For this project we used the [Baum-Welch algorithm](https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm) to train a Hidden Markov Model. For numerical stability, we added scaling factors to the forward backward probabilities in the [forward-backward algorithm](https://en.m.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm).
 
 The hyper parameters we have for the model are the number of hidden states, the max number of iterations if the algorithm hasn't converged to a certain likelihood, and the amount of training data read in.
 
@@ -14,13 +14,13 @@ The hyper parameters we have for the model are the number of hidden states, the 
 5) Display the sequence of words.
 
 # Predicting text
-1) Use the (Viterbi algorithm)[https://en.m.wikipedia.org/wiki/Viterbi_algorithm] on the user-entered text sequence to find the most likely last state for the HMM to be in.
+1) Use the [Viterbi algorithm](https://en.m.wikipedia.org/wiki/Viterbi_algorithm) on the user-entered text sequence to find the most likely last state for the HMM to be in.
 2) Do steps 2-5 of the generating text section.
 
 Note: If the user enters a word that isn't found in the training dataset, then we don't predict any following sequence of text.
 
 # Dataset:
-For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html)
+For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html).
 
 # How to Compile:
 Our project uses Python 3.7.1 with the modules: pickle, random, sys, math, tqdm, pandas.
@@ -28,16 +28,14 @@ To run this project, run `python main.py`. This command will prompt the user cho
 to either 1) generate n new words of text or 2) predict the next n words
 of text following the user's input. 
 
-<<<<<<< HEAD
 # Limitations
 - The model was not trained using numpy matrices so it's very slow. 
-- Training on hidden states over 75 or greater causes underflow errors because the probabilities in the transition matrix become too small.
+- Training on hidden states at around 75 or greater causes underflow errors because the probabilities in the transition matrix become too small.
 - There is semblance of probabilistic understanding in the order of words that are generated but usually nothing coherent comes out.
-=======
+
 # Sample Output
 ### Text Generation
 ![pic1](sample\ output/Text_Gen.png)
->>>>>>> a50d6a2c75e108a9db8c36cfdcf83a97d8581ab8
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
