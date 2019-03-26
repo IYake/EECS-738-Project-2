@@ -20,9 +20,7 @@ How many words to generate?
 
 Wonderful. if you eye Very
 I.: evil? Jenner. as It 
-
 NEVER: Waldman. the 
-
 CREATURE: talent
 ```
 
@@ -37,9 +35,10 @@ Note: If the user enters a word that isn't found in the training dataset, then w
 Enter your sequence of words: 
 
 CREATURE
-How many words to predict? 
 
+How many words to predict? 
 50
+
 removed a in mind. can He letter have Oh, He may your the It's and Like 
 HENRY: She 
 CREATURE: and 
