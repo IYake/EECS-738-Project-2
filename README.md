@@ -13,12 +13,41 @@ The hyper parameters we have for the model are the number of hidden states, the 
 4) Repeat steps 2-3 until the prompted number of words is generated.
 5) Display the sequence of words.
 
+## Sample Output
+```
+How many words to generate?
+15
+
+Wonderful. if you eye Very
+I.: evil? Jenner. as It 
+
+NEVER: Waldman. the 
+
+CREATURE: talent
+```
+
 # Predicting text
 1) Use the [Viterbi algorithm](https://en.m.wikipedia.org/wiki/Viterbi_algorithm) on the user-entered text sequence to find the most likely last state for the HMM to be in.
 2) Do steps 2-5 of the generating text section.
 
 Note: If the user enters a word that isn't found in the training dataset, then we don't predict any following sequence of text.
 
+## Sample Output
+```
+Enter your sequence of words: 
+
+CREATURE
+How many words to predict? 
+
+50
+removed a in mind. can He letter have Oh, He may your the It's and Like 
+HENRY: She 
+CREATURE: and 
+VICTOR: To the questions? 
+SHE: heard God held my you He I you my expense north, hurt He on? come missionaries. done. You're Your always took Frankenstein? 
+JUSTINE: 
+CREATURE: mad?
+```
 # Dataset:
 For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html).
 
@@ -32,10 +61,6 @@ of text following the user's input.
 - The model was not trained using numpy matrices so it's very slow. 
 - Training on hidden states at around 75 or greater causes underflow errors because the probabilities in the transition matrix become too small.
 - There is semblance of probabilistic understanding in the order of words that are generated but usually nothing coherent comes out.
-
-# Sample Output
-### Text Generation
-![pic1](sample\ output/Text_Gen.png)
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
