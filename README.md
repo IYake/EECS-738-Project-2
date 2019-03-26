@@ -48,7 +48,7 @@ JUSTINE:
 CREATURE: mad?
 ```
 # Dataset:
-For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html).
+For our project we chose to use the quotes from the movie Frankenstein (1931) in the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html). 
 
 # How to Compile:
 Our project uses Python 3.7.1 with the modules: pickle, random, sys, math, tqdm, pandas.
