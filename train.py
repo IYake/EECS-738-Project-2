@@ -16,7 +16,7 @@ def train():
     all_words = []
 
     #hyper parameters
-    hidden_states = 10
+    hidden_states = 20
     lines = 100
     num_iters = 200
     speakers = []

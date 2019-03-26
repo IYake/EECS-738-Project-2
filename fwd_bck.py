@@ -316,17 +316,15 @@ def generate(model, numWords):
     for i in range(numWords):
         generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
-        # print("\n\n", ''.join(generatedSentence))
+        
     for i in range(numWords):
-        if generatedSentence[i].isupper():
-            # continue
-            print("\n", ''.join(generatedSentence[i]).lstrip(), ": ", end = "")
-        elif i == numWords-1:
-            print(''.join(generatedSentence[i]), end = "\n")
+        if generatedSentence[i].isupper() and generatedSentence[i] != "I":
+            print("\n" + generatedSentence[i] + ": ", end = "")
         else:
-            print(''.join(generatedSentence[i]), end = " ")
+            print(generatedSentence[i], end = " ")
+    print("\n")
 
-    # print(" ".join(generatedSentence))
+    #print(" ".join(generatedSentence))
 
 #given a sequence of text, predict the words that come after
 #using the trained model
@@ -375,7 +373,13 @@ def predict(model,numWords,observations):
             prediction.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
             curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
 
-        print(" ".join(prediction))
+#        print(" ".join(prediction))
+        for i in range(numWords):
+            if prediction[i].isupper() and prediction[i] != "I":
+                print("\n" + prediction[i] + ": ", end = "")
+            else:
+                print(prediction[i], end = " ")
+        print("\n")
 
 
 if __name__ == "__main__":

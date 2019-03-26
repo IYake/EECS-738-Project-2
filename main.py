@@ -21,7 +21,9 @@ def main():
         if (choice == "2"):
             print("Enter your sequence of words: ")
             sequence = tuple(input().split())
-            predict(model,20,sequence)
+            print("How many words to predict? ")
+            numWords = int(input())
+            predict(model,numWords,sequence)
         print("------------------------")
 
 if __name__ == "__main__":
