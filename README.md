@@ -28,7 +28,7 @@ To run this project, run `python main.py`. This command will prompt the user cho
 to either 1) generate n new words of text or 2) predict the next n words
 of text following the user's input. 
 
-<<<<<<< HEAD
+
 # Limitations
 - The model was not trained using numpy matrices so it's very slow. 
 - Training on hidden states over 75 or greater causes underflow errors because the probabilities in the transition matrix become too small.
@@ -36,8 +36,18 @@ of text following the user's input.
 =======
 # Sample Output
 ### Text Generation
-![pic1](sample\ output/Text_Gen.png)
->>>>>>> a50d6a2c75e108a9db8c36cfdcf83a97d8581ab8
+`Choose an option:`
+`1) Generate text`
+`2) Predict text from sequence of words`
+`3) Quit`
+`Choice: `
+`1`
+`How many words to generate? `
+`15`
+`Wonderful. if you eye Very `
+`I.: evil? Jenner. as It `
+`NEVER: Waldman. the `
+`CREATURE: talent`
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
