@@ -4,7 +4,7 @@ def main():
     choice = None
     numWords = None
     sequence = None
-    model = load("hmm.pickle")
+    model = load("frankenstein.pickle")
     while (choice != "3"):
         print("Choose an option:")
         print("1) Generate text")
