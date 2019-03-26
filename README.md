@@ -37,16 +37,27 @@ of text following the user's input.
 # Sample Output
 ### Text Generation
 `Choose an option:`
+
 `1) Generate text`
+
 `2) Predict text from sequence of words`
+
 `3) Quit`
+
 `Choice: `
+
 `1`
+
 `How many words to generate? `
+
 `15`
+
 `Wonderful. if you eye Very `
+
 `I.: evil? Jenner. as It `
+
 `NEVER: Waldman. the `
+
 `CREATURE: talent`
 
 # References 
