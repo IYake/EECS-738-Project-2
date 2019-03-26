@@ -314,13 +314,15 @@ def generate(model, numWords):
     generatedSentence = []
     curr_st = start_st
     for i in range(numWords):
-        generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
+        word = random.choices(ob_type,emm_list[curr_st],k=1)[0]
+        generatedSentence.append(word.strip())
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
         # print("\n\n", ''.join(generatedSentence))
     for i in range(numWords):
-        if generatedSentence[i].isupper():
+        # print(generatedSentence[i].isupper(), len(generatedSentence) > 1)
+        if ((generatedSentence[i].isupper()) and (len(generatedSentence[i]) > 1)):
             # continue
-            print("\n", ''.join(generatedSentence[i]).lstrip(), ": ", end = "")
+            print("\n", ''.join(generatedSentence[i]), ": ", end = "")
         elif i == numWords-1:
             print(''.join(generatedSentence[i]), end = "\n")
         else:
