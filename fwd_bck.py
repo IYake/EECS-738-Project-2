@@ -7,7 +7,6 @@ import pickle
 import random
 import sys
 import math
-import string
 #import time
 from tqdm import tqdm
 
@@ -314,7 +313,8 @@ def generate(model, numWords):
     generatedSentence = []
     curr_st = start_st
     for i in range(numWords):
-        generatedSentence.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
+        word = random.choices(ob_type,emm_list[curr_st],k=1)[0]
+        generatedSentence.append(word.strip())
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
         
     for i in range(numWords):

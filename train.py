@@ -1,6 +1,5 @@
 from fwd_bck import trainHMM, save
 import pprint as pp
-import string
 import pandas as pd
 import re
 
