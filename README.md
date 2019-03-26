@@ -19,5 +19,7 @@ and therefore the program reprompts the user.
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
+
 https://en.m.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm
+
 https://en.m.wikipedia.org/wiki/Viterbi_algorithm
