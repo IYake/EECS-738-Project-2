@@ -17,7 +17,7 @@ The hyper parameters we have for the model are the number of hidden states, the 
 1) Use the (Viterbi algorithm)[https://en.m.wikipedia.org/wiki/Viterbi_algorithm] on the user-entered text sequence to find the most likely last state for the HMM to be in.
 2) Do steps 2-5 of the generating text section.
 
-Note: If the user enters a word that isn't found in the training dataset, then we don't predict the any following sequence of text.
+Note: If the user enters a word that isn't found in the training dataset, then we don't predict any following sequence of text.
 
 # Dataset:
 For our project we chose to use the [Cornell Movie Dataset](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html)
@@ -27,6 +27,11 @@ Our project uses Python 3.7.1 with the modules: pickle, random, sys, math, tqdm,
 To run this project, run `python main.py`. This command will prompt the user choose
 to either 1) generate n new words of text or 2) predict the next n words
 of text following the user's input. 
+
+# Limitations
+- The model was not trained using numpy matrices so it's very slow. 
+- Training on hidden states over 75 or greater causes underflow errors because the probabilities in the transition matrix become too small.
+- There is semblance of probabilistic understanding in the order of words that are generated but usually nothing coherent comes out.
 
 # References 
 https://en.m.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm
