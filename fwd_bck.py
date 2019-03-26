@@ -1,7 +1,3 @@
-"""
-Forward backward algorithm from:
-https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
-"""
 import pprint as pp
 import pickle
 import random
@@ -16,10 +12,7 @@ def trainHMM(num_states, observations, num_iters, save_as = "train"):
     string = 'S'
     states = [string+str(i) for i in range(1, num_states+1)]
     end_st = 'end'
-
     ob_type = list(dict.fromkeys(observations).keys())
-
-
     #pi
     start_prob = {}
     #randomizing the inintal values of start_prob aka pi
@@ -59,15 +52,12 @@ def trainHMM(num_states, observations, num_iters, save_as = "train"):
     #         'S1' : {'N':0.5,'E':0.5},
     #         'S2' : {'N':0.5,'E':0.5}
     #         }
-    #is this fwd_bck necessary?
-    forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-
 
     model = Update(observations, trans_prob, emm_prob, start_prob, states,end_st,ob_type, num_iters)
     save(model, file_prefix = save_as)
     return model
 
-
+#from https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm#Python_example
 def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     # forward part of the algorithm
     c = []
@@ -128,7 +118,7 @@ def fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st):
     #assert p_fwd == p_bkw
     return fwd, bkw, posterior,likelihood
 
-#https://en.wikipedia.org/wiki/Viterbi_algorithm
+#from https://en.wikipedia.org/wiki/Viterbi_algorithm
 def viterbi(obs, states, start_p, trans_p, emit_p):
     V = [{}]
     for st in states:
@@ -173,6 +163,7 @@ def dptable(V):
     yield " ".join(("%12d" % i) for i in range(len(V)))
     for state in V[0]:
         yield "%.7s: " % state + " ".join("%.7s" % ("%f" % v[state]["prob"]) for v in V)
+        
 # Maximation functions
 
 def update_start_prob(gammas):
@@ -251,13 +242,14 @@ def likelihood(forward,states):
         likelihood += forward[-1][st]
     return likelihood
 
-def Update(obs, trans, emm, start, sts, end,ob_types, num_iters):
+def Update(obs, trans, emm, start, sts, end,ob_types, max_iters):
     #do this to log probability in the future
     print("Training:")
     forward = None
     backward = None
     gammas = None
     likelihood = None
+    prev_lik = None
     epsilons = None
     observations = obs
     trans_prob = trans
@@ -266,13 +258,18 @@ def Update(obs, trans, emm, start, sts, end,ob_types, num_iters):
     states = sts
     end_st = end
     ob_type = ob_types
-    for i in tqdm(range(num_iters)):
-        forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
-        epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
-        trans_prob = update_trans_prob(epsilons, gammas,states,observations)
-        emm_prob = update_em_prob(observations, gammas,states,ob_type)
-        start_prob = update_start_prob(gammas)
-    #print("Likelihood: ", likelihood) #need to scale this back
+    converged = False
+    for i in tqdm(range(max_iters)):
+        if not converged:
+            forward, backward, gammas, likelihood = fwd_bkw(observations, states, start_prob, trans_prob, emm_prob, end_st)
+            epsilons = update_eps(forward, backward, observations, trans_prob, emm_prob, states)
+            trans_prob = update_trans_prob(epsilons, gammas,states,observations)
+            emm_prob = update_em_prob(observations, gammas,states,ob_type)
+            start_prob = update_start_prob(gammas)
+            likelihood 
+            if (i > 2 and abs(likelihood-prev_lik) < 0.000001):
+                converged = True
+            prev_lik = likelihood
     #return trained model
     return [trans_prob,emm_prob,start_prob,states,ob_type, likelihood]
 
@@ -324,8 +321,6 @@ def generate(model, numWords):
             print(generatedSentence[i], end = " ")
     print("\n")
 
-    #print(" ".join(generatedSentence))
-
 #given a sequence of text, predict the words that come after
 #using the trained model
 def predict(model,numWords,observations):
@@ -350,11 +345,6 @@ def predict(model,numWords,observations):
             j = states.index(st2)
             trans_list[i][j] = trans_prob[st1][st2]
 
-#    #find starting states
-#    start_prob_list = list(start_prob.values())
-#    start_st = random.choices([i for i in range(len(start_prob_list))], start_prob_list,k=1)[0]
-
-
     wordsInData = True
     for i in range(len(observations)):
         if observations[i] not in list(emm_prob[states[0]].keys()):
@@ -373,7 +363,6 @@ def predict(model,numWords,observations):
             prediction.append(random.choices(ob_type,emm_list[curr_st],k=1)[0])
             curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
 
-#        print(" ".join(prediction))
         for i in range(numWords):
             if prediction[i].isupper() and prediction[i] != "I":
                 print("\n" + prediction[i] + ": ", end = "")
@@ -381,9 +370,8 @@ def predict(model,numWords,observations):
                 print(prediction[i], end = " ")
         print("\n")
 
-
+#testing
 if __name__ == "__main__":
     observations = tuple([random.choices(['N','E'],[8,2],k=1)[0] for i in range(10)])
     model = trainHMM(2,observations, save_as = "testModel")
-
     generate(model,10)

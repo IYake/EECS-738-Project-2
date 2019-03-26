@@ -1,4 +1,3 @@
-
 from fwd_bck import load, generate, predict
 
 def main():
