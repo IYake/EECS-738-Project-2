@@ -1,4 +1,4 @@
-from fwd_bck import trainHMM
+from hmm import trainHMM
 import pandas as pd
 
 def train():

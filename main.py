@@ -1,4 +1,4 @@
-from fwd_bck import load, generate, predict
+from hmm import load, generate, predict
 
 def main():
     choice = None
