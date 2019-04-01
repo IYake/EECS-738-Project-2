@@ -163,7 +163,7 @@ def dptable(V):
     yield " ".join(("%12d" % i) for i in range(len(V)))
     for state in V[0]:
         yield "%.7s: " % state + " ".join("%.7s" % ("%f" % v[state]["prob"]) for v in V)
-        
+
 # Maximation functions
 
 def update_start_prob(gammas):
@@ -266,7 +266,7 @@ def Update(obs, trans, emm, start, sts, end,ob_types, max_iters):
             trans_prob = update_trans_prob(epsilons, gammas,states,observations)
             emm_prob = update_em_prob(observations, gammas,states,ob_type)
             start_prob = update_start_prob(gammas)
-            likelihood 
+            likelihood
             if (i > 2 and abs(likelihood-prev_lik) < 0.000001):
                 converged = True
             prev_lik = likelihood
@@ -313,7 +313,7 @@ def generate(model, numWords):
         word = random.choices(ob_type,emm_list[curr_st],k=1)[0]
         generatedSentence.append(word.strip())
         curr_st = random.choices([i for i in range(len(trans_list))], trans_list[curr_st],k=1)[0]
-        
+
     for i in range(numWords):
         if generatedSentence[i].isupper() and generatedSentence[i] != "I":
             print("\n" + generatedSentence[i] + ": ", end = "")
